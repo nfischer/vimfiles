@@ -1,0 +1,12 @@
+" Vim config gitignore file
+
+*.sw*
+*~
+
+.DS_Store
+
+bundle/
+spell/
+.netrwhist
+plugin/instantlyBetterVim12/
+plugin/instantlyBetterVim13/
