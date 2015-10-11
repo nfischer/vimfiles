@@ -196,10 +196,6 @@ if has('gui_running')
   set nosol
   nnoremap <silent> <C-v> :set nosol<CR><C-v>
   vnoremap <silent> <ESC> <ESC>:set sol<CR>
-  let guiMode = 'gui'
-else
-  " Terminal specific
-  let guiMode = 'terminal'
 endif
 
 if g:os ==# 'windows'
@@ -257,10 +253,9 @@ nnoremap k gk
 nnoremap gj j
 nnoremap gk k
 
-" <C-o> redraws the screen & removes search highlight
-" Do not remove this mapping!
+" This is a tmux workaround to allow me to redraw the screen with
+" <prefix-key><C-l>
 nnoremap <silent> <C-o> :<C-u>nohl<CR><C-l>
-nnoremap <silent> <Space> :<C-u>nohl<CR><C-l>
 
 " <C-a> highlights all, + will increment numbers
 nnoremap + <C-a>
@@ -299,8 +294,8 @@ nnoremap ` '
 " OR ELSE just highlight the match in red
 hi WhiteOnRed guifg=white guibg=red ctermfg=white ctermbg=red
 function! HLNext (blinktime)
-  let [bufnum, lnum, col, off] = getpos('.')
-  let l:matchlen = strlen(matchstr(strpart(getline('.'),col-1),@/))
+  let [l:bufnum, l:lnum, l:col, l:off] = getpos('.')
+  let l:matchlen = strlen(matchstr(strpart(getline('.'),l:col-1),@/))
   let l:target_pat = '\c\%#'.@/
   let l:blinks = 4
   let l:sleep_cmd =  'sleep ' . float2nr((a:blinktime / l:blinks) * 1000) . 'm'
@@ -350,34 +345,35 @@ function! MoveChar(dir)
 endfunction
 
 " Times the number of times a particular command takes to execute the specified number of times (in seconds).
-function! HowLong( command, numberOfTimes )
+function! HowLong(number_of_times, ...)
   " We don't want to be prompted by a message if the command being tried is
   " an echo as that would slow things down while waiting for user input.
-  let more = &more
+  let l:command = join(a:000)
+  echo 'Running "' . l:command . '" ' . a:number_of_times . ' times'
+
+  let l:old_more = &more
   set nomore
-  let startTime = localtime()
-  for i in range( a:numberOfTimes )
-    execute a:command
+  let l:start_time = localtime()
+  for i in range(a:number_of_times)
+    execute l:command
   endfor
-  let result = localtime() - startTime
-  let &more = more
-  return result
+  let l:result = localtime() - l:start_time
+  let &more = l:old_more
+  return l:result
 endfunction
+
+command! -nargs=+ -complete=command Profile echo HowLong(<f-args>)
 
 "==== Leader functions ===="
 
 function! RenameTokenFunction(orig, new) range
-  echo winsaveview()
   if a:orig ==# a:new
     echoerr 'These are the same thing!'
   endif
 
   let l:reset_pos = 1
   if !search('\<' . a:orig . '\>', 'nw')
-    echo 'no reset'
     let l:reset_pos = 0
-  else
-    echo 'reset'
   endif
 
   " Do a global replace
@@ -386,14 +382,6 @@ function! RenameTokenFunction(orig, new) range
       \ . '/g'
   echo a:orig . ' -> ' . a:new
   call setreg('/', l:old_search)
-
-  if l:reset_pos
-    echo 'hi'
-    norm! ``
-  else
-    echo 'bye'
-    norm! ``
-  endif
 endfunction
 
 " a:orig is the original indent, and a:new is the preferred new indent
@@ -409,10 +397,8 @@ function! ChangeIndentFunc(orig, new)
 endfunction
 
 function! MoveSplit(dir)
-  " TODO(nate): Rewrite this to not use control sequences
   let l:left_cmd  = 'vertical resize -5'
   let l:right_cmd = 'vertical resize +5'
-
   if (winnr() == 1 && a:dir ==# 'left') ||
       \ (winnr() == winnr('$') && a:dir !=# 'left')
     exe l:left_cmd
@@ -433,7 +419,6 @@ function! MdToPdf()
   " Test for pandoc
   let l:pandoc_path = system('which pandoc 2>/dev/null')
   let l:md_name = expand('%')
-  let l:base_name = expand('%:r')
   if empty(l:pandoc_path)
     " Pandoc isn't installed
     echohl ErrorMsg
@@ -445,17 +430,15 @@ function! MdToPdf()
     echohl None
   else
     " Create pdf
-    let pdf_name = l:base_name . '.pdf'
-    let l:p_cmd = 'pandoc ' . l:md_name . ' -o ' . pdf_name
+    let l:pdf_name = expand('%:r') . '.pdf'
+    let l:p_cmd = 'pandoc ' . l:md_name . ' -o ' . l:pdf_name
     let l:output = system(l:p_cmd)
-    if l:output == ''
-      let l:cmd = 'xdg-open ' . pdf_name . ' >/dev/null 2>&1 &'
-      " let l:output = system(l:cmd)
-      exe 'silent !' . l:cmd
-      redraw!
+    if empty(l:output)
+      let l:cmd = 'xdg-open ' . l:pdf_name . ' >/dev/null 2>&1 &'
+      call system(l:cmd)
     else
       " We got an error of some sort
-      echohl WarningMsg | echo output | echohl None
+      echohl WarningMsg | echomsg output | echohl None
     endif
   endif
 endfunction
@@ -526,9 +509,9 @@ function! RunProject()
     echomsg 'Error: could not find a runtarget'
     echohl NONE
   else
-    let exe_str = './' . l:runtarget
-    exec 'silent !echo ' . exe_str
-    exec '!' . exe_str
+    let l:exe_str = './' . l:runtarget
+    exec 'silent !echo ' . l:exe_str
+    exec '!' . l:exe_str
   endif
 endfunction
 
@@ -665,8 +648,8 @@ endfunction
 
 function! WC_file(...)
   if (a:0 > 0)
-    let output = system('wc '.a:1)
-    let op_list = split(output)
+    let l:output = system('wc '.a:1)
+    let l:op_list = split(l:output)
   else
     let s:old_status = v:statusmsg
     exe "silent normal! g\<c-g>"
@@ -675,7 +658,7 @@ function! WC_file(...)
       let s:char_count = str2nr(split(v:statusmsg)[15])
       let v:statusmsg = s:old_status
       " Format: lines: x words: y chars: z
-      let op_list = [line('$'), s:word_count, s:char_count]
+      let l:op_list = [line('$'), s:word_count, s:char_count]
     catch
       echo 'No file'
       return
@@ -683,11 +666,11 @@ function! WC_file(...)
   endif
   highlight NormalUnderlined term=underline cterm=underline gui=underline
   echon 'lines: '  | echohl NormalUnderlined
-  echon op_list[0] | echohl NONE
+  echon l:op_list[0] | echohl NONE
   echon ' words: ' | echohl NormalUnderlined
-  echon op_list[1] | echohl NONE
+  echon l:op_list[1] | echohl NONE
   echon ' chars: ' | echohl NormalUnderlined
-  echon op_list[2] | echohl NONE
+  echon l:op_list[2] | echohl NONE
 endfunction
 
 function! WordCount(...)
@@ -786,13 +769,14 @@ augroup JumpCursorOnEdit
    autocmd BufReadPost *
       \ if expand('<afile>:p:h') !=? $TEMP |
       \ if line("'\"") > 1 && line("'\"") <= line('$') |
-      \   let JumpCursorOnEdit_foo = line("'\"") |
+      \   let g:jump_cursor_on_edit_foo = line("'\"") |
       \   let b:doopenfold = 1 |
-      \   if (foldlevel(JumpCursorOnEdit_foo) > foldlevel(JumpCursorOnEdit_foo - 1)) |
-      \    let JumpCursorOnEdit_foo = JumpCursorOnEdit_foo - 1 |
+      \   if (foldlevel(g:jump_cursor_on_edit_foo) >
+              \ foldlevel(g:jump_cursor_on_edit_foo - 1)) |
+      \    let g:jump_cursor_on_edit_foo = g:jump_cursor_on_edit_foo - 1 |
       \    let b:doopenfold = 2 |
       \   endif |
-      \   exe JumpCursorOnEdit_foo |
+      \   exe g:jump_cursor_on_edit_foo |
       \ endif |
       \ endif
    " Need to postpone using 'zv' until after reading the modelines.
