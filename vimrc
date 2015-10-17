@@ -42,7 +42,6 @@ else
   set rtp+=~/.vim/bundle/Vundle.vim/
 endif
 
-" call vundle#rc()
 call vundle#begin()
 Plugin 'bling/vim-airline'
 Plugin 'christoomey/vim-tmux-navigator'
@@ -59,6 +58,7 @@ Plugin 'tpope/vim-commentary'
 Plugin 'tpope/vim-fugitive'
 Plugin 'tpope/vim-repeat'
 Plugin 'tpope/vim-surround'
+Plugin 'chrisbra/vim-diff-enhanced'
 " Plugin 'airblade/vim-gitgutter'
 " Plugin 'ap/vim-buftabline'
 " Plugin 'bpowell/vim-android'
@@ -71,6 +71,9 @@ let g:syntastic_mode_map = { 'mode': 'passive' }
 
 " For Airline
 set laststatus=2
+
+" For PatienceDiff
+let &diffexpr='EnhancedDiff#Diff("git diff", "--diff-algorithm=patience")'
 
 " Built-in plugins
 runtime ftplugin/man.vim
@@ -279,7 +282,11 @@ imap <C-l> <Esc>[s1z=`]a
 " OR ELSE just the 81st column of wide lines
 hi ColorColumn  gui=bold guifg=black guibg=magenta cterm=bold ctermfg=black
    \ ctermbg=magenta
-call matchadd('ColorColumn', '\%81v', 100)
+augroup HilightColumn
+  autocmd!
+  autocmd BufEnter,WinEnter * call matchadd('ColorColumn', '\%81v', 100)
+  " autocmd BufEnter,WinEnter *.java call matchadd('ColorColumn', '\%101v', 100)
+augroup END
 
 "====[ Highlight matches when jumping to next ]===="
 
@@ -483,35 +490,23 @@ endfunction
 function! RunProject()
   " Try to see if the current file is executable
   let l:runtarget = system('find ' . expand('%:p') . ' -type f -executable -print')
-  if !empty(l:runtarget)
-    echo l:runtarget
-    sleep 1
-    exe '! ' . l:runtarget
-    return
-  else
+  if empty(l:runtarget)
     " Search all open buffers for an executable file
     let l:executables = split(system('find * -type f -executable -print'), '\n')
-    let l:fname = expand('%')
     for e in l:executables
-      if e ==# l:fname
-        let l:runtarget = l:fname
-        break
-      elseif bufexists(e)
-        let l:runtarget = e
-      elseif empty(l:runtarget)
+      if bufexists(e) || empty(l:runtarget)
         let l:runtarget = e
       endif
     endfor
   endif
-
   if empty(l:runtarget)
     echohl ErrorMsg
     echomsg 'Error: could not find a runtarget'
     echohl NONE
   else
-    let l:exe_str = './' . l:runtarget
-    exec 'silent !echo ' . l:exe_str
-    exec '!' . l:exe_str
+    let l:full_path = fnamemodify(l:runtarget, ':p')
+    exec 'silent !echo ' . l:full_path
+    exec '!' . l:full_path
   endif
 endfunction
 
@@ -523,26 +518,21 @@ function! EditConfigFile(configName, ...)
     echohl ErrorMsg
     echo a:configName . ' can't be edited'
     echohl NONE
-    return
-  endif
-  let l:fname = expand('%:p')
-  if line('$') == 1 && getline(1) == '' " Better method of testing
-    " We're not editing anything interesting, so open in a full window
-    exe 'edit! ' . a:configName
-  elseif l:fname ==# a:configName
-    if g:warnedForFile == 0
+  else
+    let l:fname = expand('%:p')
+    if line('$') == 1 && getline(1) == '' && empty(l:fname)
+      " We're not editing anything interesting, so open in a full window
+      exe 'edit ' . a:configName
+    elseif l:fname ==# a:configName && g:warnedForFile == 0
       echo 'Already editing ' . expand('%:t') . '. Try again to open'
       let g:warnedForFile = 1
     else
       exe 'vsp ' . a:configName
     endif
-  else
-    " Open in a split
-    exe 'vsp ' . a:configName
-  endif
-  " Configure this buffer
-  if !exists('a:1')
-    set bufhidden=delete
+    " Configure this buffer
+    if !exists('a:1')
+      set bufhidden=delete
+    endif
   endif
 endfunction
 
@@ -551,18 +541,16 @@ function! MakeExecutable(...)
     if len(a:000) == 0
       let l:oldautoread = &l:autoread
       setlocal autoread
-      silent !chmod 755 %
+      call system('chmod 755 ' . expand('%:p'))
+      checktime
       let &l:autoread = l:oldautoread
     else
-      let l:files = ''
-      for f in a:000
-        " it is correct to have ' ' at the start of the string
-        let l:files = l:files . ' ' . f
-      endfor
-      exe 'silent !chmod 755' . l:files
+      let l:oldautoread = &autoread
+      let l:files = join(a:000)
+      call system('chmod 755 ' . l:files)
+      checktime
+      let &autoread = l:oldautoread
     endif
-    checktime
-    redraw!
   else
     echohl ErrorMsg
     echom "Error: This isn't a unix system"
@@ -619,12 +607,6 @@ function! NumberOfBuffers()
     return j
 endfunction
 
-function! CloseAndWait()
-  silent! bdel .vimrc .bashrc
-  echo 'hi'
-  sleep 1
-endfunction
-
 function! SudoWriteFile()
   " This will write a file that is read-only, using sudo permission
   silent write !sudo tee % >/dev/null
@@ -637,13 +619,19 @@ elseif g:os == 'Darwin'
   let g:open_cmd = 'open'
 endif " Windows?
 
+function! InsertIFS()
+  let l:lines = ['old_IFS=$IFS', "IFS='", "'", 'IFS=$old_IFS']
+  for l:line in l:lines
+    put=l:line
+  endfor
+endfunction
+
 function! OpenFunction(...)
   for f in a:000
     echo f
     " asynchronously open f
-    exe 'silent !(' . g:open_cmd . ' ' . f . '&>/dev/null &)'
+    call system(g:open_cmd . ' ' . f . '&>/dev/null &')
   endfor
-  redraw!
 endfunction
 
 function! WC_file(...)
@@ -708,13 +696,12 @@ nmap <silent> <leader>f  :echo expand('%')<CR>
 nmap <silent> <leader>w  :<C-u>silent call FixWhiteSpace()<CR>
 
 nmap <silent> <leader>sh :!true<CR>
-nmap <silent> <leader>m  :make<CR>
+nmap <silent> <leader>m  :make<Up><CR>
 nmap <silent> <leader>ru :call RunProject()<CR>
 nmap          <leader>2  A >&2<ESC>
 
-" TODO: eliminate control characters
-nmap          <leader>i  iold_IFS=$IFSIFS=''IFS=$old_IFS
-nmap <silent> <leader>o  :silent !xdg-open %<CR>:redraw!<CR>
+nmap          <leader>i  :call InsertIFS()<CR>
+nmap <silent> <leader>o  :Open %<CR>
 nmap <silent> <leader>p  :call MdToPdf()<CR>
 nmap <silent> <leader>u  :call Underline('-')<CR>
 nmap <silent> <leader>U  :call Underline('=')<CR>
@@ -728,11 +715,7 @@ nmap <silent> <leader>3  I### 
 command! -nargs=* -range=% RenameToken <line1>,<line2>
     \ call RenameTokenFunction(<f-args>)
 
-" TODO: delete this shit
-command! -nargs=0 DoTwoThings echo 'hi' | norm! ``
-
 command! -nargs=+ ChangeIndent call ChangeIndentFunc(<f-args>)
-
 command! -nargs=0 Fn echo expand('%')
 
 " Make this file executable
@@ -744,10 +727,9 @@ command! W call SudoWriteFile()
 " Enable opening a file using vim
 command! -complete=file -nargs=+ Open call OpenFunction(<f-args>)
 
+" Unixy things
 command! -complete=file -nargs=+ Rm call DeleteThisFile(<f-args>)
-
 command! -complete=file -nargs=* Ls !ls --color=auto <f-args>
-
 command! -complete=file -nargs=* Wc call WordCount(<f-args>)
 
 "====[ Open any file with a pre-existing swapfile in readonly mode ]===="
@@ -768,24 +750,24 @@ augroup JumpCursorOnEdit
    au!
    autocmd BufReadPost *
       \ if expand('<afile>:p:h') !=? $TEMP |
-      \ if line("'\"") > 1 && line("'\"") <= line('$') |
-      \   let g:jump_cursor_on_edit_foo = line("'\"") |
-      \   let b:doopenfold = 1 |
-      \   if (foldlevel(g:jump_cursor_on_edit_foo) >
-              \ foldlevel(g:jump_cursor_on_edit_foo - 1)) |
-      \    let g:jump_cursor_on_edit_foo = g:jump_cursor_on_edit_foo - 1 |
-      \    let b:doopenfold = 2 |
+      \   if line("'\"") > 1 && line("'\"") <= line('$') |
+      \     let g:jump_cursor_on_edit_foo = line("'\"") |
+      \     let b:doopenfold = 1 |
+      \     if (foldlevel(g:jump_cursor_on_edit_foo) >
+                \ foldlevel(g:jump_cursor_on_edit_foo - 1)) |
+      \      let g:jump_cursor_on_edit_foo = g:jump_cursor_on_edit_foo - 1 |
+      \      let b:doopenfold = 2 |
+      \     endif |
+      \     exe g:jump_cursor_on_edit_foo |
       \   endif |
-      \   exe g:jump_cursor_on_edit_foo |
-      \ endif |
       \ endif
    " Need to postpone using 'zv' until after reading the modelines.
    autocmd BufWinEnter *
       \ if exists('b:doopenfold') |
-      \ exe 'normal! zv' |
-      \ if(b:doopenfold > 1) |
-      \   exe  '+'.1 |
-      \ endif |
+      \   exe 'normal! zv' |
+      \   if(b:doopenfold > 1) |
+      \     exe  '+'.1 |
+      \   endif |
       \ unlet b:doopenfold |
       \ endif
 augroup END
