@@ -2,12 +2,12 @@
 
 "==== System Information ===="
 if has('win32') || has('win16')
-  let g:os = 'windows'
+  let s:os = 'windows'
 elseif has('unix')
-  let g:os = substitute(system('uname'), '\n', '', '')
+  let s:os = substitute(system('uname'), '\n', '', '')
   " set shellcmdflag=-ic      " Improve the shell!
 else
-  let g:os = 'undefined'
+  let s:os = 'undefined'
 endif
 
 let g:mapleader = ','
@@ -36,7 +36,7 @@ set backspace=indent,eol,start
 
 "==== Vundle ===="
 filetype off
-if g:os ==# 'windows'
+if s:os ==# 'windows'
   set rtp+=~/vimfiles/bundle/Vundle.vim/
 else
   set rtp+=~/.vim/bundle/Vundle.vim/
@@ -50,6 +50,7 @@ Plugin 'google/vim-glaive'
 Plugin 'google/vim-maktaba'
 Plugin 'nfischer/Vundle.vim'
 Plugin 'nfischer/vim-vimignore'
+Plugin 'nfischer/vim-marker'
 Plugin 'rgrinberg/vim-ocaml'
 Plugin 'scrooloose/syntastic'
 Plugin 'tmux-plugins/vim-tmux'
@@ -105,10 +106,6 @@ nmap <silent> <leader>vi :<C-u>PluginInstall<CR>
 nmap <silent> <leader>vl :<C-u>PluginList<CR>
 
 " Tmux mappings
-nnoremap <silent> <A-Left>  :TmuxNavigateLeft<cr>
-nnoremap <silent> <A-Down>  :TmuxNavigateDown<cr>
-nnoremap <silent> <A-Up>    :TmuxNavigateUp<cr>
-nnoremap <silent> <A-Right> :TmuxNavigateRight<cr>
 nnoremap <silent> <Left>    :TmuxNavigateLeft<cr>
 nnoremap <silent> <Down>    :TmuxNavigateDown<cr>
 nnoremap <silent> <Up>      :TmuxNavigateUp<cr>
@@ -124,11 +121,11 @@ nnoremap <silent> <Right>   :TmuxNavigateRight<cr>
 " let g:syntastic_check_on_wq = 0
 
 "==== Indentation and word wrapping ===="
-if !exists('g:has_set_indent')
+if !exists('s:has_set_indent')
   set shiftwidth=2 tabstop=2 softtabstop=2
   set expandtab
   set smarttab
-  let g:has_set_indent = 1
+  let s:has_set_indent = 1
 endif
 
 " Format options to wordwrap properly, but not auto-comment
@@ -201,10 +198,10 @@ if has('gui_running')
   vnoremap <silent> <ESC> <ESC>:set sol<CR>
 endif
 
-if g:os ==# 'windows'
+if s:os ==# 'windows'
   set dir=%TMP%              " Hide .swp files away on windows
-else
-  set dir=~/.vim/tmp,.
+" else
+  " set dir=~/.vim/tmp,.
 endif
 
 "==== Capslock ===="
@@ -237,8 +234,9 @@ cnoremap  q1  q!
 " Force tmux to respect <C-a>
 cnoremap  <C-a> <home>
 
-" Prevent annoying ex mode
-nnoremap Q <nop>
+" Prevent annoying ex mode & suspending
+nnoremap Q     <nop>
+nnoremap <C-z> <nop>
 
 " Help with quickfix (also leader mappings)
 nnoremap <silent> cn :cnext<CR>
@@ -258,7 +256,7 @@ nnoremap gk k
 
 " This is a tmux workaround to allow me to redraw the screen with
 " <prefix-key><C-l>
-nnoremap <silent> <C-o> :<C-u>nohl<CR><C-l>
+nnoremap <silent> <leader>ll :<C-u>nohl<CR><C-l>
 
 " <C-a> highlights all, + will increment numbers
 nnoremap + <C-a>
@@ -291,11 +289,9 @@ augroup END
 "====[ Highlight matches when jumping to next ]===="
 
 " This rewires n and N to do the highlighting
-let g:n_time  = 0.15
-let g:gt_time = 0.15
-nnoremap <silent> n   n:call HLNext(g:n_time)<CR>
-nnoremap <silent> N   N:call HLNext(g:n_time)<CR>
-nnoremap <silent> '   :call HLGoto(g:gt_time)<CR>
+nnoremap <silent> n   n:call HLNext(0.15)<CR>
+nnoremap <silent> N   N:call HLNext(0.15)<CR>
+nnoremap <silent> '   :call HLGoto(0.15)<CR>
 nnoremap ` '
 
 " OR ELSE just highlight the match in red
@@ -422,33 +418,33 @@ function! FixWhiteSpace()
   call setreg('/', l:old_search)
 endfunction
 
-function! MdToPdf()
-  " Test for pandoc
-  let l:pandoc_path = system('which pandoc 2>/dev/null')
-  let l:md_name = expand('%')
-  if empty(l:pandoc_path)
-    " Pandoc isn't installed
-    echohl ErrorMsg
-    echomsg 'Pandoc is not installed. Unable to create pdf'
-    echohl None
-  elseif empty(l:md_name)
-    echohl ErrorMsg
-    echomsg "You aren't writing a saved file!"
-    echohl None
-  else
-    " Create pdf
-    let l:pdf_name = expand('%:r') . '.pdf'
-    let l:p_cmd = 'pandoc ' . l:md_name . ' -o ' . l:pdf_name
-    let l:output = system(l:p_cmd)
-    if empty(l:output)
-      let l:cmd = 'xdg-open ' . l:pdf_name . ' >/dev/null 2>&1 &'
-      call system(l:cmd)
-    else
-      " We got an error of some sort
-      echohl WarningMsg | echomsg output | echohl None
-    endif
-  endif
-endfunction
+" function! MdToPdf()
+"   " Test for pandoc
+"   let l:pandoc_path = system('which pandoc 2>/dev/null')
+"   let l:md_name = expand('%')
+"   if empty(l:pandoc_path)
+"     " Pandoc isn't installed
+"     echohl ErrorMsg
+"     echomsg 'Pandoc is not installed. Unable to create pdf'
+"     echohl None
+"   elseif empty(l:md_name)
+"     echohl ErrorMsg
+"     echomsg "You aren't writing a saved file!"
+"     echohl None
+"   else
+"     " Create pdf
+"     let l:pdf_name = expand('%:r') . '.pdf'
+"     let l:p_cmd = 'pandoc ' . l:md_name . ' -o ' . l:pdf_name
+"     let l:output = system(l:p_cmd)
+"     if empty(l:output)
+"       let l:cmd = 'xdg-open ' . l:pdf_name . ' >/dev/null 2>&1 &'
+"       call system(l:cmd)
+"     else
+"       " We got an error of some sort
+"       echohl WarningMsg | echomsg output | echohl None
+"     endif
+"   endif
+" endfunction
 
 function! DrawBox()
   normal! yy2p
@@ -457,26 +453,26 @@ function! DrawBox()
   nohl
 endfunction
 
-function! Underline(myVar)
-  let l:lineNumber = line('.')
-  let l:nextLine = getline(l:lineNumber + 1)
-  " Test if nextLine is an underline
-  let l:isUnderline = 0 " not ready yet
+" function! Underline(myVar)
+"   let l:lineNumber = line('.')
+"   let l:nextLine = getline(l:lineNumber + 1)
+"   " Test if nextLine is an underline
+"   let l:isUnderline = 0 " not ready yet
 
-  " Delete the line if it's an underline
-  if l:isUnderline == 1
-    normal! jddk
-  endif
+"   " Delete the line if it's an underline
+"   if l:isUnderline == 1
+"     normal! jddk
+"   endif
 
-  " Insert new line composed of myVar
-  if a:myVar == '='
-    normal! yypVr=
-    return
-  else
-    normal! yypVr-
-    return
-  endif
-endfunction
+"   " Insert new line composed of myVar
+"   if a:myVar == '='
+"     normal! yypVr=
+"     return
+"   else
+"     normal! yypVr-
+"     return
+"   endif
+" endfunction
 
 " TODO: Make a Todo command (use value of commentstring setting)
 function! AddTodo(msg)
@@ -510,24 +506,24 @@ function! RunProject()
   endif
 endfunction
 
-let g:warnedForFile = 0
-
 "==== Edit .vimrc quickly ===="
-function! EditConfigFile(configName, ...)
-  if !filewritable(a:configName)
+function! EditConfigFile(config_name, ...)
+  if !filewritable(a:config_name)
     echohl ErrorMsg
-    echo a:configName . ' can't be edited'
+    echo a:config_name . " can't be edited"
     echohl NONE
   else
     let l:fname = expand('%:p')
-    if line('$') == 1 && getline(1) == '' && empty(l:fname)
+    if line('$') == 1 && empty(getline(1)) && empty(l:fname)
       " We're not editing anything interesting, so open in a full window
-      exe 'edit ' . a:configName
-    elseif l:fname ==# a:configName && g:warnedForFile == 0
+      exe 'edit ' . a:config_name
+    elseif l:fname ==# a:config_name && !exists('s:warned_for_file')
+      echohl WarningMsg
       echo 'Already editing ' . expand('%:t') . '. Try again to open'
-      let g:warnedForFile = 1
+      echohl NONE
+      let s:warned_for_file = 1
     else
-      exe 'vsp ' . a:configName
+      exe 'vsp ' . a:config_name
     endif
     " Configure this buffer
     if !exists('a:1')
@@ -612,11 +608,11 @@ function! SudoWriteFile()
   silent write !sudo tee % >/dev/null
 endfunction
 
-let g:open_cmd = ''
-if g:os == 'Linux'
-  let g:open_cmd = 'xdg-open'
-elseif g:os == 'Darwin'
-  let g:open_cmd = 'open'
+let s:open_cmd = ''
+if s:os == 'Linux'
+  let s:open_cmd = 'xdg-open'
+elseif s:os == 'Darwin'
+  let s:open_cmd = 'open'
 endif " Windows?
 
 function! InsertIFS()
@@ -630,7 +626,7 @@ function! OpenFunction(...)
   for f in a:000
     echo f
     " asynchronously open f
-    call system(g:open_cmd . ' ' . f . '&>/dev/null &')
+    call system(s:open_cmd . ' ' . f . '&>/dev/null &')
   endfor
 endfunction
 
@@ -639,12 +635,12 @@ function! WC_file(...)
     let l:output = system('wc '.a:1)
     let l:op_list = split(l:output)
   else
-    let s:old_status = v:statusmsg
+    let l:oldstatus = v:statusmsg
     exe "silent normal! g\<c-g>"
     try
       let s:word_count = str2nr(split(v:statusmsg)[11])
       let s:char_count = str2nr(split(v:statusmsg)[15])
-      let v:statusmsg = s:old_status
+      let v:statusmsg = l:oldstatus
       " Format: lines: x words: y chars: z
       let l:op_list = [line('$'), s:word_count, s:char_count]
     catch
@@ -667,7 +663,7 @@ function! WordCount(...)
   else
     for f in a:000
       call WC_file(f)
-      echon '\t' . f
+      echon '   ' . f
       echo ''
     endfor
   endif
@@ -675,44 +671,45 @@ endfunction
 
 "==== Leader mappings ===="
 
-nmap <silent> <leader>st :SyntasticToggleMode<CR>
-nmap          <leader>rf :RenameToken <C-r><C-w><space>
-vmap          <leader>rf :RenameToken<space>
-nmap          <leader>vg :vimgrep<Space><C-r><C-W><Space>*<CR>
+nnoremap <silent> <leader>st :SyntasticToggleMode<CR>
+nnoremap          <leader>rf :RenameToken <C-r><C-w><space>
+vnoremap          <leader>rf :RenameToken<space>
+nnoremap          <leader>vg :vimgrep<Space><C-r><C-W><Space>*<CR>
+nnoremap <silent> <leader>qf :<C-u>cwindow<CR>
+nnoremap <silent> <leader>C  :let &scrolloff=999-&scrolloff<CR>
+noremap  <silent> <leader>ev :<C-u>call EditConfigFile($MYVIMRC)<CR>
+noremap  <silent> <leader>eb :<C-u>call EditConfigFile(expand('~/.bashrc'))<CR>
+noremap  <silent> <leader>et :<C-u>call
+    \ EditConfigFile(expand('~/.tmux.conf'))<CR>
+noremap  <silent> <leader>sv :<C-u>source $MYVIMRC<CR>
+noremap  <silent> <leader>eh :<C-u>exe 'vsp ' . expand('<cfile>')<CR>
+map      <silent> <leader>ef <leader>eh
+noremap  <silent> <leader>ec :<C-u>exe 'vsp ' . expand('<cfile>:r') . '.c'<CR>
 
-nmap <silent> <leader>qf :<C-u>cwindow<CR>
+noremap  <silent> <leader>rm :call DeleteThisFile()<CR>
 
-map  <silent> <leader>ev :<C-u>call EditConfigFile($MYVIMRC)<CR>
-map  <silent> <leader>eb :<C-u>call EditConfigFile(expand('~/.bashrc'))<CR>
-map  <silent> <leader>et :<C-u>call EditConfigFile(expand('~/.tmux.conf'))<CR>
-map  <silent> <leader>sv :<C-u>source $MYVIMRC<CR>
-map  <silent> <leader>eh :<C-u>exe 'vsp ' . expand('<cfile>')<CR>
-map  <silent> <leader>ef <leader>eh
-map  <silent> <leader>ec :<C-u>exe 'vsp ' . expand('<cfile>:r') . '.c'<CR>
+nnoremap <silent> <leader>f  :echo expand('%')<CR>
+nnoremap <silent> <leader>w  :<C-u>silent call FixWhiteSpace()<CR>
 
-map  <silent> <leader>rm :call DeleteThisFile()<CR>
+nnoremap <silent> <leader>sh :!true<CR>
+nnoremap <silent> <leader>m  :make<Up><CR>
+nnoremap <silent> <leader>ru :call RunProject()<CR>
+nnoremap          <leader>2  A >&2<ESC>
 
-nmap <silent> <leader>f  :echo expand('%')<CR>
-nmap <silent> <leader>w  :<C-u>silent call FixWhiteSpace()<CR>
-
-nmap <silent> <leader>sh :!true<CR>
-nmap <silent> <leader>m  :make<Up><CR>
-nmap <silent> <leader>ru :call RunProject()<CR>
-nmap          <leader>2  A >&2<ESC>
-
-nmap          <leader>i  :call InsertIFS()<CR>
-nmap <silent> <leader>o  :Open %<CR>
-nmap <silent> <leader>p  :call MdToPdf()<CR>
-nmap <silent> <leader>u  :call Underline('-')<CR>
-nmap <silent> <leader>U  :call Underline('=')<CR>
-nmap <silent> <leader>bo :call DrawBox()<CR>
+nnoremap          <leader>i  :call InsertIFS()<CR>
+nnoremap <silent> <leader>o  :Open %<CR>
+nnoremap <silent> <leader>p  :Pandoc<CR>
+nnoremap <silent> <leader>u  :call marker#Underline('-')<CR>
+nnoremap <silent> <leader>U  :call marker#Underline('=')<CR>
+nnoremap <silent> <leader>bo :call DrawBox()<CR>
 " TODO: Put this in a command, in a plugin
-nmap <silent> <leader>3  I### 
+nnoremap <silent> <leader>3  I### <esc>
 
 
 "==== Custom Commands ===="
 
-command! -nargs=* -range=% RenameToken <line1>,<line2>
+command! -nargs=1 Todo call AddTodo(<q-args>)
+command! -nargs=* -range=% -complete=var RenameToken <line1>,<line2>
     \ call RenameTokenFunction(<f-args>)
 
 command! -nargs=+ ChangeIndent call ChangeIndentFunc(<f-args>)
@@ -742,37 +739,42 @@ augroup NoSimultaneousEdits
   autocmd SwapExists * sleep 1
 augroup END
 
-"==== Taken from online ===="
-
 " TODO: make this work for multiple :vs edits
 " Restore cursor position to where it was before
+function! s:JumpToLastPosition(fname)
+  if expand(a:fname . ':p:h') !=? $TEMP
+    if line("'\"") > 1 && line("'\"") <= line('$')
+      let l:last_line = line("'\"")
+      let b:doopenfold = 1
+      if (foldlevel(l:last_line) > foldlevel(l:last_line - 1))
+        let b:doopenfold = 2
+      endif
+      normal! `"
+      if b:doopenfold == 2
+        normal! k
+      endif
+    endif
+  endif
+endfunction
+
+" Need to postpone using 'zv' until after reading the modelines.
+function! s:OpenFolds()
+  if exists('b:doopenfold')
+    exe 'normal! zv'
+    if(b:doopenfold > 1)
+      exe  '+'.1
+    endif
+    unlet b:doopenfold
+  endif
+endfunction
+
 augroup JumpCursorOnEdit
-   au!
-   autocmd BufReadPost *
-      \ if expand('<afile>:p:h') !=? $TEMP |
-      \   if line("'\"") > 1 && line("'\"") <= line('$') |
-      \     let g:jump_cursor_on_edit_foo = line("'\"") |
-      \     let b:doopenfold = 1 |
-      \     if (foldlevel(g:jump_cursor_on_edit_foo) >
-                \ foldlevel(g:jump_cursor_on_edit_foo - 1)) |
-      \      let g:jump_cursor_on_edit_foo = g:jump_cursor_on_edit_foo - 1 |
-      \      let b:doopenfold = 2 |
-      \     endif |
-      \     exe g:jump_cursor_on_edit_foo |
-      \   endif |
-      \ endif
-   " Need to postpone using 'zv' until after reading the modelines.
-   autocmd BufWinEnter *
-      \ if exists('b:doopenfold') |
-      \   exe 'normal! zv' |
-      \   if(b:doopenfold > 1) |
-      \     exe  '+'.1 |
-      \   endif |
-      \ unlet b:doopenfold |
-      \ endif
+  autocmd!
+  autocmd BufReadPost * call s:JumpToLastPosition('<afile>')
+  autocmd BufWinEnter * call s:OpenFolds()
 augroup END
 
-"==== Make tabs, trailing whitespace, and non-breaking spaces visible but only in non-insert mode===="
+"==== Make tabs, trailing whitespace, and non-breaking spaces visible, but not in insert mode ===="
 
 exec "set listchars=tab:\uB6~,trail:\uB7,nbsp:~"
 set list
@@ -783,33 +785,28 @@ set list
 
 nnoremap <silent> <C-w>h :call MoveSplit('left')<CR>
 nnoremap <silent> <C-w>l :call MoveSplit('right')<CR>
-"==== Use a plugin from Instantly Better Vim to drag visual blocks ===="
 
+"==== Use a plugin from Instantly Better Vim to drag visual blocks ===="
 vmap  <expr>  <LEFT>   DVB_Drag('left')
 vmap  <expr>  <RIGHT>  DVB_Drag('right')
 vmap  <expr>  <DOWN>   DVB_Drag('down')
 vmap  <expr>  <UP>     DVB_Drag('up')
 vmap  <expr>  D        DVB_Duplicate()
-
-" Remove any introduced trailing whitespace after moving
 let g:DVB_TrimWS = 1
 
-" Move a single char left or right
-nmap  <expr>  <C-LEFT>   MoveChar('left')
-nmap  <expr>  <C-RIGHT>  MoveChar('right')
-
-"==== Changes list from comma separated to bulleted and back====
-"from Instantly better Vim 2013
-
-nmap  <leader>l   :call ListTrans_toggle_format()<CR>
-vmap  <leader>l   :call ListTrans_toggle_format('visual')<CR>
+"==== Changes list from comma separated to bulleted and back ===="
+nmap  <leader>lt  :call ListTrans_toggle_format()<CR>
+vmap  <leader>lt  :call ListTrans_toggle_format('visual')<CR>
 
 "==== Do some math on columns. Instantly better vim ===="
 vmap <expr>  ++  VMATH_YankAndAnalyse()
 nmap         ++  vip++
 
-"==== Load .vimrc at startup ===="
+" Move a single char left or right
+nmap  <expr>  <C-LEFT>   MoveChar('left')
+nmap  <expr>  <C-RIGHT>  MoveChar('right')
 
+"==== Reload vimrc whenever it's saved ===="
 augroup ConfigReload
   autocmd!
   autocmd BufWritePost $MYVIMRC source $MYVIMRC
