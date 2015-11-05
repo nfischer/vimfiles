@@ -68,7 +68,7 @@ Plugin 'tpope/vim-surround'
 call vundle#end()
 
 " SyntasticToggleMode
-let g:syntastic_mode_map = { 'mode': 'passive' }
+" let g:syntastic_mode_map = { 'mode': 'passive' }
 
 " For Airline
 set laststatus=2
@@ -86,24 +86,23 @@ augroup FTOptions
   autocmd FileType c,cpp,cs,java,markdown   setlocal commentstring=//\ %s
   autocmd FileType bash,python              setlocal commentstring=#\ %s
   autocmd FileType vim                      setlocal commentstring=\"\ %s
-  autocmd FileType gitcommit                setlocal spell
-  autocmd FileType bash,sh,zsh,csh,tcsh
-      \ inoremap <silent> <buffer> <C-X>! #!/bin/<C-R>=&ft<CR>
+  autocmd FileType gitcommit,markdown       setlocal spell
 augroup END
 
 " Fugitive mappings
-nmap <silent> <leader>gs :<C-u>Gstatus<CR>
-nmap <silent> <leader>ga :<C-u>Gwrite<CR>
-nmap <silent> <leader>gc :<C-u>Gcommit<CR>
-nmap <silent> <leader>gp :<C-u>Gpush<CR>
-nmap <silent> <leader>gd :<C-u>Gdiff<CR>
-nmap <silent> <leader>gi :<C-u>GEditIgnore<CR>
+nnoremap <silent> <leader>gs :<C-u>Gstatus<CR>
+nnoremap <silent> <leader>ga :<C-u>Gwrite<CR>
+nnoremap <silent> <leader>gc :<C-u>Gcommit<CR>
+nnoremap <silent> <leader>gp :<C-u>Gpush<CR>
+nnoremap <silent> <leader>gd :<C-u>Gdiff<CR>
+nnoremap <silent> <leader>gb :<C-u>Gblame<CR>
+nnoremap <silent> <leader>gi :<C-u>GEditIgnore<CR>
 set diffopt=vertical
 
 " Vundle mappings
-nmap <silent> <leader>vu :<C-u>PluginInstall!<CR>
-nmap <silent> <leader>vi :<C-u>PluginInstall<CR>
-nmap <silent> <leader>vl :<C-u>PluginList<CR>
+nnoremap <silent> <leader>vu :<C-u>PluginInstall!<CR>
+nnoremap <silent> <leader>vi :<C-u>PluginInstall<CR>
+nnoremap <silent> <leader>vl :<C-u>PluginList<CR>
 
 " Tmux mappings
 nnoremap <silent> <Left>    :TmuxNavigateLeft<cr>
@@ -171,11 +170,11 @@ set t_Co=256
 set t_ut=
 set background=dark
 syntax on
-hi Cursorline gui=NONE    cterm=NONE                ctermbg=darkgrey
-hi Normal     guifg=white guibg=black ctermfg=white
-hi Search     guifg=black guibg=cyan  ctermfg=black ctermbg=cyan
-hi SpellBad   guifg=black guibg=red   ctermfg=black ctermbg=red
-hi SpellCap   guifg=white guibg=blue  ctermfg=white ctermbg=blue
+hi Cursorline gui=NONE    cterm=NONE                     ctermbg=darkgrey
+hi Normal     guifg=white guibg=black   ctermfg=white
+hi Search     guifg=black guibg=cyan    ctermfg=black    ctermbg=cyan
+hi SpellBad   guifg=black guibg=red     ctermfg=black    ctermbg=red
+hi SpellCap   guifg=white guibg=blue    ctermfg=white    ctermbg=blue
 hi VertSplit  guifg=darkgrey guibg=NONE ctermfg=darkgrey ctermbg=NONE
    \ cterm=bold gui=bold
 
@@ -183,7 +182,7 @@ hi VertSplit  guifg=darkgrey guibg=NONE ctermfg=darkgrey ctermbg=NONE
 set hlsearch                 " highlights search results
 nohl                         " Default = don't highlight
 set incsearch                " searches as you type
-set ignorecase smartcase     " case insens for all-lower searches
+set ignorecase smartcase     " case insensitive for all-lower searches
 
 if has('gui_running')
   " GUI specific
@@ -199,16 +198,16 @@ if has('gui_running')
 endif
 
 if s:os ==# 'windows'
-  set dir=%TMP%              " Hide .swp files away on windows
-" else
-  " set dir=~/.vim/tmp,.
+  set dir=%TMP%
+else
+  set dir=~/.vim/tmp,.
 endif
 
 "==== Capslock ===="
 " Execute 'lnoremap x X' and 'lnoremap X x' for each letter a-z.
 for c in range(char2nr('A'), char2nr('Z'))
-  execute 'lnoremap ' . nr2char(c+32) . ' ' . nr2char(c)
-  execute 'lnoremap ' . nr2char(c) . ' ' . nr2char(c+32)
+  exe 'lnoremap ' . nr2char(c+32) . ' ' . nr2char(c)
+  exe 'lnoremap ' . nr2char(c) . ' ' . nr2char(c+32)
 endfor
 
 augroup InsertEvents
@@ -228,25 +227,21 @@ set winaltkeys=no
 noremap  ;  :
 noremap  <Bslash>  ;
 
-cnoremap  q~  q!
-cnoremap  q1  q!
-
 " Force tmux to respect <C-a>
 cnoremap  <C-a> <home>
 
-" Prevent annoying ex mode & suspending
+" Prevents annoying behavior
 nnoremap Q     <nop>
 nnoremap <C-z> <nop>
-
-" Help with quickfix (also leader mappings)
-nnoremap <silent> cn :cnext<CR>
-nnoremap <silent> cp :cprevious<CR>
-
-" prevents annoying behavior
 nnoremap  <silent> K  k:echoerr 'CAPSLOCK IS ON'<CR>
 nnoremap  <silent> J  j:echoerr 'CAPSLOCK IS ON'<CR>
 vnoremap  <silent> K  k:<C-u>echoerr 'CAPSLOCK IS ON'<CR>gv
 vnoremap  <silent> J  j:<C-u>echoerr 'CAPSLOCK IS ON'<CR>gv
+cnoremap  q~  q!
+cnoremap  q1  q!
+
+nnoremap <silent> cn :cnext<CR>
+nnoremap <silent> cp :cprevious<CR>
 
 " Treat long lines as break lines
 nnoremap j gj
@@ -269,15 +264,13 @@ nnoremap Y y$
 if exists('+spelllang')
   set spelllang=en_us
 endif
-nmap <silent> <leader>sp :setlocal spell!\|set spell?<CR>
-vmap <silent> <leader>sp :<C-u>setlocal spell!<CR>gv
-imap <C-l> <Esc>[s1z=`]a
+nnoremap <silent> <leader>sp :setlocal spell!\|set spell?<CR>
+vnoremap <silent> <leader>sp :<C-u>setlocal spell!<CR>gv
+inoremap <C-l> <Esc>[s1z=`]a
 
 "==== Instantly Better Vim additions ===="
 
 "====[ Make the 81st column stand out ]===="
-
-" OR ELSE just the 81st column of wide lines
 hi ColorColumn  gui=bold guifg=black guibg=magenta cterm=bold ctermfg=black
    \ ctermbg=magenta
 augroup HilightColumn
@@ -287,8 +280,6 @@ augroup HilightColumn
 augroup END
 
 "====[ Highlight matches when jumping to next ]===="
-
-" This rewires n and N to do the highlighting
 nnoremap <silent> n   n:call HLNext(0.15)<CR>
 nnoremap <silent> N   N:call HLNext(0.15)<CR>
 nnoremap <silent> '   :call HLGoto(0.15)<CR>
@@ -358,14 +349,12 @@ function! HowLong(number_of_times, ...)
   set nomore
   let l:start_time = localtime()
   for i in range(a:number_of_times)
-    execute l:command
+    exe l:command
   endfor
   let l:result = localtime() - l:start_time
   let &more = l:old_more
   return l:result
 endfunction
-
-command! -nargs=+ -complete=command Profile echo HowLong(<f-args>)
 
 "==== Leader functions ===="
 
@@ -418,34 +407,6 @@ function! FixWhiteSpace()
   call setreg('/', l:old_search)
 endfunction
 
-" function! MdToPdf()
-"   " Test for pandoc
-"   let l:pandoc_path = system('which pandoc 2>/dev/null')
-"   let l:md_name = expand('%')
-"   if empty(l:pandoc_path)
-"     " Pandoc isn't installed
-"     echohl ErrorMsg
-"     echomsg 'Pandoc is not installed. Unable to create pdf'
-"     echohl None
-"   elseif empty(l:md_name)
-"     echohl ErrorMsg
-"     echomsg "You aren't writing a saved file!"
-"     echohl None
-"   else
-"     " Create pdf
-"     let l:pdf_name = expand('%:r') . '.pdf'
-"     let l:p_cmd = 'pandoc ' . l:md_name . ' -o ' . l:pdf_name
-"     let l:output = system(l:p_cmd)
-"     if empty(l:output)
-"       let l:cmd = 'xdg-open ' . l:pdf_name . ' >/dev/null 2>&1 &'
-"       call system(l:cmd)
-"     else
-"       " We got an error of some sort
-"       echohl WarningMsg | echomsg output | echohl None
-"     endif
-"   endif
-" endfunction
-
 function! DrawBox()
   normal! yy2p
   s/+/\|/eg
@@ -453,33 +414,15 @@ function! DrawBox()
   nohl
 endfunction
 
-" function! Underline(myVar)
-"   let l:lineNumber = line('.')
-"   let l:nextLine = getline(l:lineNumber + 1)
-"   " Test if nextLine is an underline
-"   let l:isUnderline = 0 " not ready yet
-
-"   " Delete the line if it's an underline
-"   if l:isUnderline == 1
-"     normal! jddk
-"   endif
-
-"   " Insert new line composed of myVar
-"   if a:myVar == '='
-"     normal! yypVr=
-"     return
-"   else
-"     normal! yypVr-
-"     return
-"   endif
-" endfunction
-
-" TODO: Make a Todo command (use value of commentstring setting)
 function! AddTodo(msg)
-  let l:todo_string = substitute(&commentstring, '%s', 'TODO(' . $USER . '): ' . a:msg, '')
+  let l:todo_str = 'TODO(' . $USER . '): ' . a:msg
+  if &commentstring !~# ' $'
+    let l:todo_str = ' ' . l:todo_str
+  endif
+  let l:full_text = substitute(&commentstring, '%s', l:todo_str, '')
   let l:line_text = getline('.')
   let l:indent = matchstr(l:line_text, '^\s*')
-  put!=l:indent . l:todo_string
+  put!=l:indent . l:full_text
 endfunction
 
 " TODO: Clean this up
@@ -496,31 +439,28 @@ function! RunProject()
     endfor
   endif
   if empty(l:runtarget)
-    echohl ErrorMsg
-    echomsg 'Error: could not find a runtarget'
-    echohl NONE
+    let l:msg = 'Error: could not find a runtarget'
+    echohl ErrorMsg | echomsg l:msg | echohl NONE
   else
     let l:full_path = fnamemodify(l:runtarget, ':p')
-    exec 'silent !echo ' . l:full_path
-    exec '!' . l:full_path
+    exe 'silent !echo ' . l:full_path
+    exe '!' . l:full_path
   endif
 endfunction
 
 "==== Edit .vimrc quickly ===="
 function! EditConfigFile(config_name, ...)
   if !filewritable(a:config_name)
-    echohl ErrorMsg
-    echo a:config_name . " can't be edited"
-    echohl NONE
+    let l:msg = a:config_name . " can't be edited"
+    echohl ErrorMsg | echo l:msg | echohl NONE
   else
     let l:fname = expand('%:p')
     if line('$') == 1 && empty(getline(1)) && empty(l:fname)
       " We're not editing anything interesting, so open in a full window
       exe 'edit ' . a:config_name
     elseif l:fname ==# a:config_name && !exists('s:warned_for_file')
-      echohl WarningMsg
-      echo 'Already editing ' . expand('%:t') . '. Try again to open'
-      echohl NONE
+      let l:msg = 'Already editing ' . expand('%:t') . '. Try again to open'
+      echohl WarningMsg | echo l:msg | echohl NONE
       let s:warned_for_file = 1
     else
       exe 'vsp ' . a:config_name
@@ -534,7 +474,7 @@ endfunction
 
 function! MakeExecutable(...)
   if has('unix')
-    if len(a:000) == 0
+    if a:0 == 0
       let l:oldautoread = &l:autoread
       setlocal autoread
       call system('chmod 755 ' . expand('%:p'))
@@ -563,7 +503,7 @@ function! DeleteThisFile(...)
   if a:0 == 0
     " Delete the current file
     let l:file_name = shellescape(expand('%:p'))
-    silent bdel
+    silent bdelete
     let l:cmd = l:rm_cmd . ' ' . l:file_name
   else
     let l:file_list = []
@@ -592,15 +532,14 @@ function! DeleteThisFile(...)
 endfunction
 
 function! NumberOfBuffers()
-    let i = bufnr('$')
-    let j = 0
-    while i >= 1
-        if buflisted(i)
-            let j+=1
-        endif
-        let i-=1
-    endwhile
-    return j
+  let l:highest = bufnr('$')
+  let l:bufcount = 0
+  for i in range(1, l:highest+1)
+    if buflisted(i)
+      let l:bufcount+=1
+    endif
+  endfor
+  return l:bufcount
 endfunction
 
 function! SudoWriteFile()
@@ -609,9 +548,9 @@ function! SudoWriteFile()
 endfunction
 
 let s:open_cmd = ''
-if s:os == 'Linux'
+if s:os ==# 'Linux'
   let s:open_cmd = 'xdg-open'
-elseif s:os == 'Darwin'
+elseif s:os ==# 'Darwin'
   let s:open_cmd = 'open'
 endif " Windows?
 
@@ -649,12 +588,12 @@ function! WC_file(...)
     endtry
   endif
   highlight NormalUnderlined term=underline cterm=underline gui=underline
-  echon 'lines: '  | echohl NormalUnderlined
-  echon l:op_list[0] | echohl NONE
-  echon ' words: ' | echohl NormalUnderlined
-  echon l:op_list[1] | echohl NONE
-  echon ' chars: ' | echohl NormalUnderlined
-  echon l:op_list[2] | echohl NONE
+  echon 'lines: '
+  echohl NormalUnderlined | echon l:op_list[0] | echohl NONE
+  echon ' words: '
+  echohl NormalUnderlined | echon l:op_list[1] | echohl NONE
+  echon ' chars: '
+  echohl NormalUnderlined | echon l:op_list[2] | echohl NONE
 endfunction
 
 function! WordCount(...)
@@ -671,9 +610,10 @@ endfunction
 
 "==== Leader mappings ===="
 
-nnoremap <silent> <leader>st :SyntasticToggleMode<CR>
+nnoremap          <leader>bu :b<Space>
 nnoremap          <leader>rf :RenameToken <C-r><C-w><space>
 vnoremap          <leader>rf :RenameToken<space>
+nnoremap <silent> <leader>st :SyntasticToggleMode<CR>
 nnoremap          <leader>vg :vimgrep<Space><C-r><C-W><Space>*<CR>
 nnoremap <silent> <leader>qf :<C-u>cwindow<CR>
 nnoremap <silent> <leader>C  :let &scrolloff=999-&scrolloff<CR>
@@ -692,42 +632,50 @@ nnoremap <silent> <leader>f  :echo expand('%')<CR>
 nnoremap <silent> <leader>w  :<C-u>silent call FixWhiteSpace()<CR>
 
 nnoremap <silent> <leader>sh :!true<CR>
+
+" Run last make target
 nnoremap <silent> <leader>m  :make<Up><CR>
 nnoremap <silent> <leader>ru :call RunProject()<CR>
-nnoremap          <leader>2  A >&2<ESC>
 
-nnoremap          <leader>i  :call InsertIFS()<CR>
+nnoremap          <leader>2  A >&2<ESC>
+nnoremap <silent> <leader>i  :call InsertIFS()<CR>
 nnoremap <silent> <leader>o  :Open %<CR>
+
 nnoremap <silent> <leader>p  :Pandoc<CR>
 nnoremap <silent> <leader>u  :call marker#Underline('-')<CR>
 nnoremap <silent> <leader>U  :call marker#Underline('=')<CR>
 nnoremap <silent> <leader>bo :call DrawBox()<CR>
 " TODO: Put this in a command, in a plugin
-nnoremap <silent> <leader>3  I### <esc>
-
+nnoremap <silent> <leader>3  :Header 3<CR>
+nnoremap <silent> <leader>4  :Header 4<CR>
 
 "==== Custom Commands ===="
 
-command! -nargs=1 Todo call AddTodo(<q-args>)
-command! -nargs=* -range=% -complete=var RenameToken <line1>,<line2>
+com! -nargs=1                        Todo call AddTodo(<q-args>)
+com! -nargs=0                        RunProject call RunProject()
+com! -nargs=+ -complete=command      Profile echo HowLong(<f-args>)
+
+"  TODO(nate): Move this into a separate plugin
+com! -nargs=* -complete=var -range=% RenameToken <line1>,<line2>
     \ call RenameTokenFunction(<f-args>)
 
-command! -nargs=+ ChangeIndent call ChangeIndentFunc(<f-args>)
-command! -nargs=0 Fn echo expand('%')
+com! -nargs=+                        ChangeIndent
+    \ call ChangeIndentFunc(<f-args>)
+com! -nargs=0                        Fn echo expand('%')
 
 " Make this file executable
-command! -complete=file -nargs=* Chmod call MakeExecutable(<f-args>)
+com! -nargs=* -complete=file         Chmod call MakeExecutable(<f-args>)
 
 " Enable saving read-only files using sudo
-command! W call SudoWriteFile()
+com! -nargs=0                        W call SudoWriteFile()
 
 " Enable opening a file using vim
-command! -complete=file -nargs=+ Open call OpenFunction(<f-args>)
+com! -nargs=+ -complete=file         Open call OpenFunction(<f-args>)
 
 " Unixy things
-command! -complete=file -nargs=+ Rm call DeleteThisFile(<f-args>)
-command! -complete=file -nargs=* Ls !ls --color=auto <f-args>
-command! -complete=file -nargs=* Wc call WordCount(<f-args>)
+com! -nargs=+ -complete=file         Rm call DeleteThisFile(<f-args>)
+com! -nargs=* -complete=file         Ls echo system('ls --color=auto <f-args>')
+com! -nargs=* -complete=file         Wc call WordCount(<f-args>)
 
 "====[ Open any file with a pre-existing swapfile in readonly mode ]===="
 augroup NoSimultaneousEdits
@@ -735,11 +683,10 @@ augroup NoSimultaneousEdits
   autocmd SwapExists * let v:swapchoice = 'o'
   autocmd SwapExists * echohl ErrorMsg
   autocmd SwapExists * echomsg 'Duplicate edit session (readonly)'
-  autocmd SwapExists * echohl None
+  autocmd SwapExists * echohl NONE
   autocmd SwapExists * sleep 1
 augroup END
 
-" TODO: make this work for multiple :vs edits
 " Restore cursor position to where it was before
 function! s:JumpToLastPosition(fname)
   if expand(a:fname . ':p:h') !=? $TEMP
@@ -770,13 +717,13 @@ endfunction
 
 augroup JumpCursorOnEdit
   autocmd!
-  autocmd BufReadPost * call s:JumpToLastPosition('<afile>')
+  autocmd BufReadPost,BufWinEnter * call s:JumpToLastPosition('<afile>')
   autocmd BufWinEnter * call s:OpenFolds()
 augroup END
 
 "==== Make tabs, trailing whitespace, and non-breaking spaces visible, but not in insert mode ===="
 
-exec "set listchars=tab:\uB6~,trail:\uB7,nbsp:~"
+exe "set listchars=tab:\uB6~,trail:\uB7,nbsp:~"
 set list
 
 "==== Make visual blocks a little prettier and more useful ===="
