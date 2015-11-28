@@ -5,7 +5,6 @@ if has('win32') || has('win16')
   let s:os = 'windows'
 elseif has('unix')
   let s:os = substitute(system('uname'), '\n', '', '')
-  " set shellcmdflag=-ic      " Improve the shell!
 else
   let s:os = 'undefined'
 endif
@@ -33,6 +32,15 @@ set lazyredraw
 set ruler
 set number numberwidth=1
 set backspace=indent,eol,start
+set hlsearch                 " highlights search results
+set incsearch                " searches as you type
+set ignorecase smartcase     " case insensitive for all-lower searches
+set t_Co=256
+set t_ut=
+colorscheme fischer_dark
+syntax on
+nohl                         " Default = don't highlight
+
 
 "==== Vundle ===="
 filetype off
@@ -43,14 +51,14 @@ else
 endif
 
 call vundle#begin()
-Plugin 'VundleVim/Vundle.vim'
+" Plugin 'VundleVim/Vundle.vim'
 Plugin 'bling/vim-airline'
 Plugin 'chrisbra/vim-diff-enhanced'
 Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'google/vim-codefmt'
 Plugin 'google/vim-glaive'
 Plugin 'google/vim-maktaba'
-Plugin 'nfischer/vim-marker'
+Plugin 'nfischer/vim-marker', {'pinned': 1}
 Plugin 'nfischer/vim-vimignore'
 Plugin 'rgrinberg/vim-ocaml'
 Plugin 'scrooloose/syntastic'
@@ -60,6 +68,7 @@ Plugin 'tpope/vim-commentary'
 Plugin 'tpope/vim-fugitive'
 Plugin 'tpope/vim-repeat'
 Plugin 'tpope/vim-surround'
+Plugin 'wlangstroth/vim-racket'
 " Plugin 'airblade/vim-gitgutter'
 " Plugin 'ap/vim-buftabline'
 " Plugin 'bpowell/vim-android'
@@ -67,29 +76,26 @@ Plugin 'tpope/vim-surround'
 " Plugin 'syngan/vim-vimlint'
 call vundle#end()
 
-" SyntasticToggleMode
-" let g:syntastic_mode_map = { 'mode': 'passive' }
-
-" For Airline
+" Airline settings
 set laststatus=2
 
-" For PatienceDiff
+" PatienceDiff settings
 let &diffexpr='EnhancedDiff#Diff("git diff", "--diff-algorithm=patience")'
 
 " Built-in plugins
 runtime ftplugin/man.vim
 filetype plugin on
 
-" Configure comment patterns and other things
-augroup FTOptions
+" Fugitive settings
+augroup FileTypeOptions
+  " Configure comment patterns and other things
   autocmd!
   autocmd FileType c,cpp,cs,java,markdown   setlocal commentstring=//\ %s
   autocmd FileType bash,python              setlocal commentstring=#\ %s
   autocmd FileType vim                      setlocal commentstring=\"\ %s
   autocmd FileType gitcommit,markdown       setlocal spell
+  autocmd FileType scheme                   setlocal lisp
 augroup END
-
-" Fugitive mappings
 nnoremap <silent> <leader>gs :<C-u>Gstatus<CR>
 nnoremap <silent> <leader>ga :<C-u>Gwrite<CR>
 nnoremap <silent> <leader>gc :<C-u>Gcommit<CR>
@@ -111,13 +117,14 @@ nnoremap <silent> <Up>      :TmuxNavigateUp<cr>
 nnoremap <silent> <Right>   :TmuxNavigateRight<cr>
 
 " Syntastic settings
+let g:syntastic_mode_map = { 'mode': 'passive' }
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_always_populate_loc_list = 1
 " set statusline+=%#warningmsg#
 " set statusline+=%{SyntasticStatuslineFlag()}
 " set statusline+=%*
-" let g:syntastic_always_populate_loc_list = 1
-" let g:syntastic_auto_loc_list = 1
-" let g:syntastic_check_on_open = 1
-" let g:syntastic_check_on_wq = 0
 
 "==== Indentation and word wrapping ===="
 if !exists('s:has_set_indent')
@@ -163,26 +170,8 @@ vnoremap > >gv
 augroup Markdown
   autocmd!
   autocmd BufNewfile,BufReadPost *.md set filetype=markdown
+  autocmd BufNewfile,BufReadPost *.pl set filetype=prolog
 augroup END
-
-"==== Syntax highlighting and coloring ===="
-set t_Co=256
-set t_ut=
-set background=dark
-syntax on
-hi Cursorline gui=NONE    cterm=NONE                     ctermbg=darkgrey
-hi Normal     guifg=white guibg=black   ctermfg=white
-hi Search     guifg=black guibg=cyan    ctermfg=black    ctermbg=cyan
-hi SpellBad   guifg=black guibg=red     ctermfg=black    ctermbg=red
-hi SpellCap   guifg=white guibg=blue    ctermfg=white    ctermbg=blue
-hi VertSplit  guifg=darkgrey guibg=NONE ctermfg=darkgrey ctermbg=NONE
-   \ cterm=bold gui=bold
-
-"==== Searching ===="
-set hlsearch                 " highlights search results
-nohl                         " Default = don't highlight
-set incsearch                " searches as you type
-set ignorecase smartcase     " case insensitive for all-lower searches
 
 if has('gui_running')
   " GUI specific
@@ -231,21 +220,21 @@ noremap  <Bslash>  ;
 cnoremap  <C-a> <home>
 
 " Prevents annoying behavior
-nnoremap Q     <nop>
-nnoremap <C-z> <nop>
-nnoremap  <silent> K  k:echoerr 'CAPSLOCK IS ON'<CR>
-nnoremap  <silent> J  j:echoerr 'CAPSLOCK IS ON'<CR>
-vnoremap  <silent> K  k:<C-u>echoerr 'CAPSLOCK IS ON'<CR>gv
-vnoremap  <silent> J  j:<C-u>echoerr 'CAPSLOCK IS ON'<CR>gv
-cnoremap  q~  q!
-cnoremap  q1  q!
+nnoremap          Q     <nop>
+nnoremap          <C-z> <nop>
+nnoremap <silent> K     k:echoerr 'CAPSLOCK IS ON'<CR>
+nnoremap <silent> J     j:echoerr 'CAPSLOCK IS ON'<CR>
+vnoremap <silent> K     k:<C-u>echoerr 'CAPSLOCK IS ON'<CR>gv
+vnoremap <silent> J     j:<C-u>echoerr 'CAPSLOCK IS ON'<CR>gv
+cnoremap          q~    q!
+cnoremap          q1    q!
 
 nnoremap <silent> cn :cnext<CR>
 nnoremap <silent> cp :cprevious<CR>
 
 " Treat long lines as break lines
-nnoremap j gj
-nnoremap k gk
+nnoremap j  gj
+nnoremap k  gk
 nnoremap gj j
 nnoremap gk k
 
@@ -276,7 +265,6 @@ hi ColorColumn  gui=bold guifg=black guibg=magenta cterm=bold ctermfg=black
 augroup HilightColumn
   autocmd!
   autocmd BufEnter,WinEnter * call matchadd('ColorColumn', '\%81v', 100)
-  " autocmd BufEnter,WinEnter *.java call matchadd('ColorColumn', '\%101v', 100)
 augroup END
 
 "====[ Highlight matches when jumping to next ]===="
@@ -285,60 +273,64 @@ nnoremap <silent> N   N:call HLNext(0.15)<CR>
 nnoremap <silent> '   :call HLGoto(0.15)<CR>
 nnoremap ` '
 
-" OR ELSE just highlight the match in red
-hi WhiteOnRed guifg=white guibg=red ctermfg=white ctermbg=red
-function! HLNext (blinktime)
-  let [l:bufnum, l:lnum, l:col, l:off] = getpos('.')
-  let l:matchlen = strlen(matchstr(strpart(getline('.'),l:col-1),@/))
-  let l:target_pat = '\c\%#'.@/
-  let l:blinks = 4
-  let l:sleep_cmd =  'sleep ' . float2nr((a:blinktime / l:blinks) * 1000) . 'm'
-  for n in range(1,l:blinks)
-    let l:ring = matchadd('WhiteOnRed', l:target_pat, 101)
-    redraw
-    exe l:sleep_cmd
-    call matchdelete(l:ring)
-    redraw
-    exe l:sleep_cmd
+function! Blink(blinks, blinktime, blinkcmd, unblinkcmd)
+  let l:sleep_cmd =  'sleep ' . float2nr(a:blinktime * 1000 / a:blinks) . 'm'
+  for n in range(1, a:blinks)
+    exe a:blinkcmd | redraw | exe l:sleep_cmd
+    exe a:unblinkcmd | redraw | exe l:sleep_cmd
   endfor
 endfunction
 
-function! HLGoto (blinktime)
+" OR ELSE just highlight the match in red
+hi WhiteOnRed guifg=white guibg=red ctermfg=white ctermbg=red
+function! HLNext(blinktime)
+  let l:col = col('.')
+  let l:matchlen = strlen(matchstr(strpart(getline('.'),l:col-1),@/))
+  let l:target_pat = '\c\%#'.@/
+  let l:blinks = 4
+  let l:sleep_cmd =  'sleep ' . float2nr(a:blinktime * 1000/ l:blinks) . 'm'
+  for n in range(1,l:blinks)
+    let l:ring = matchadd('WhiteOnRed', l:target_pat, 101)
+    redraw | exe l:sleep_cmd
+    call matchdelete(l:ring)
+    redraw | exe l:sleep_cmd
+  endfor
+endfunction
+
+function! HLGoto(blinktime)
+  " Go to
   try
     let l:c = nr2char( getchar() )
     exe 'normal! `' . l:c
-  catch
-    echohl ErrorMsg | echo 'E20: Mark not set' | echohl none
+  catch /.*/
+    let l:msg = substitute(v:exception, '\m\C^Vim(.*):\(.*\)$', '\1', '')
+    echohl ErrorMsg | echo l:msg | echohl none
     return
   endtry
-  let l:blinks = 4
+  " Blink
   let s:oldcursorline=&cursorline
   set nocursorline
-  let l:sleep_cmd = 'sleep ' . float2nr(a:blinktime / (l:blinks) * 1000) . 'm'
-  for n in range(0,l:blinks)
-    set cursorline!
-    redraw
-    exe l:sleep_cmd
-  endfor
+  call Blink(4, a:blinktime, 'set cursorline!', 'set cursorline!')
   " Restore cursorline setting
   let &cursorline=s:oldcursorline
 endfunction
 
 function! MoveChar(dir)
-  if (a:dir ==# 'left' && col('.') == 1) || (col('.') == col('$')-1 && a:dir !=# 'left')
+  let l:at_last_col = col('.') == col('$')-1
+  let l:is_left = a:dir ==# 'left'
+  if l:is_left && col('.') == 1 || !l:is_left && l:at_last_col
     return ''
-  elseif (a:dir ==# 'left')
-    if (col('.') == col('$')-1)
-      return 'xP'
-    else
-      return 'xhP'
-    endif
+  elseif l:is_left && l:at_last_col
+    return 'xP'
+  elseif l:is_left " and not at last column
+    return 'xhP'
   else
-    return 'xp'
+    return 'xp' " move right
   endif
 endfunction
 
-" Times the number of times a particular command takes to execute the specified number of times (in seconds).
+" Times the number of times a particular command takes to execute the specified
+" number of times (in seconds).
 function! HowLong(number_of_times, ...)
   " We don't want to be prompted by a message if the command being tried is
   " an echo as that would slow things down while waiting for user input.
@@ -416,7 +408,7 @@ endfunction
 
 function! AddTodo(msg)
   let l:todo_str = 'TODO(' . $USER . '): ' . a:msg
-  if &commentstring !~# ' $'
+  if &commentstring !~# '\v^.+ \%s'
     let l:todo_str = ' ' . l:todo_str
   endif
   let l:full_text = substitute(&commentstring, '%s', l:todo_str, '')
@@ -426,17 +418,29 @@ function! AddTodo(msg)
 endfunction
 
 " TODO: Clean this up
-function! RunProject()
+function! RunProject(...)
   " Try to see if the current file is executable
-  let l:runtarget = system('find ' . expand('%:p') . ' -type f -executable -print')
-  if empty(l:runtarget)
-    " Search all open buffers for an executable file
-    let l:executables = split(system('find * -type f -executable -print'), '\n')
-    for e in l:executables
-      if bufexists(e) || empty(l:runtarget)
-        let l:runtarget = e
-      endif
-    endfor
+  function! FindExecutables(path)
+    return system('find ' . a:path . ' -type f -executable -print')
+  endfunction
+  if a:0 > 0
+    let l:runtarget = a:1
+  else
+    let l:fname = expand('%:p')
+    if empty(l:fname)
+      let l:runtarget = ''
+    else
+      let l:runtarget = FindExecutables(l:fname)
+    endif
+    if empty(l:runtarget)
+      " Search all open buffers for an executable file
+      let l:executables = split(FindExecutables('*'), '\n')
+      for e in l:executables
+        if bufexists(e) || empty(l:runtarget)
+          let l:runtarget = e
+        endif
+      endfor
+    endif
   endif
   if empty(l:runtarget)
     let l:msg = 'Error: could not find a runtarget'
@@ -475,18 +479,15 @@ endfunction
 function! MakeExecutable(...)
   if has('unix')
     if a:0 == 0
-      let l:oldautoread = &l:autoread
-      setlocal autoread
-      call system('chmod 755 ' . expand('%:p'))
-      checktime
-      let &l:autoread = l:oldautoread
+      l:fnames = expand('%:p')
     else
-      let l:oldautoread = &autoread
-      let l:files = join(a:000)
-      call system('chmod 755 ' . l:files)
-      checktime
-      let &autoread = l:oldautoread
+      l:fnames = join(a:000) " Joins with a space
     endif
+    let l:oldautoread = &l:autoread
+    setlocal autoread
+    call system('chmod 755 ' . l:fnames)
+    checktime
+    let &l:autoread = l:oldautoread
   else
     echohl ErrorMsg
     echom "Error: This isn't a unix system"
@@ -523,11 +524,11 @@ function! DeleteThisFile(...)
     let l:msg_string = l:output
   endif
 
+  " Print command output in shell or vim, whichever makes sense
   if NumberOfBuffers() == 1 && empty(expand('%'))
-    exe 'silent !echo ' . l:msg_string
-    quit!
+    exe 'silent !echo ' . l:msg_string | quit! " In shell
   else
-    echo l:msg_string
+    echo l:msg_string " In vim if we have more buffers
   endif
 endfunction
 
@@ -555,7 +556,7 @@ elseif s:os ==# 'Darwin'
 endif " Windows?
 
 function! InsertIFS()
-  let l:lines = ['old_IFS=$IFS', "IFS='", "'", 'IFS=$old_IFS']
+  let l:lines = ['old_IFS=${IFS}', "IFS='", "'", 'IFS=${old_IFS}']
   for l:line in l:lines
     put=l:line
   endfor
@@ -613,7 +614,8 @@ endfunction
 nnoremap          <leader>bu :b<Space>
 nnoremap          <leader>rf :RenameToken <C-r><C-w><space>
 vnoremap          <leader>rf :RenameToken<space>
-nnoremap <silent> <leader>st :SyntasticToggleMode<CR>
+nnoremap          <leader>st :SyntasticToggleMode<CR>
+nnoremap          <leader>sc :SyntasticCheck<CR>
 nnoremap          <leader>vg :vimgrep<Space><C-r><C-W><Space>*<CR>
 nnoremap <silent> <leader>qf :<C-u>cwindow<CR>
 nnoremap <silent> <leader>C  :let &scrolloff=999-&scrolloff<CR>
@@ -651,31 +653,33 @@ nnoremap <silent> <leader>4  :Header 4<CR>
 
 "==== Custom Commands ===="
 
-com! -nargs=1                        Todo call AddTodo(<q-args>)
-com! -nargs=0                        RunProject call RunProject()
-com! -nargs=+ -complete=command      Profile echo HowLong(<f-args>)
+com! -nargs=0                         LongLines call setreg('/', '\m^.\{81,}$')|
+    \ echo 'press n to go to the next long line'
+com! -nargs=1                         Todo call AddTodo(<q-args>)
+com! -nargs=*                         RunProject call RunProject(<f-args>)
+com! -nargs=+ -complete=command       Profile echo HowLong(<f-args>)
 
 "  TODO(nate): Move this into a separate plugin
-com! -nargs=* -complete=var -range=% RenameToken <line1>,<line2>
+com! -nargs=* -complete=var -range=%  RenameToken <line1>,<line2>
     \ call RenameTokenFunction(<f-args>)
 
-com! -nargs=+                        ChangeIndent
+com! -nargs=+                         ChangeIndent
     \ call ChangeIndentFunc(<f-args>)
-com! -nargs=0                        Fn echo expand('%')
+com! -nargs=0                         Fn echo expand('%')
 
 " Make this file executable
-com! -nargs=* -complete=file         Chmod call MakeExecutable(<f-args>)
+com! -nargs=* -complete=file          Chmod call MakeExecutable(<f-args>)
 
 " Enable saving read-only files using sudo
-com! -nargs=0                        W call SudoWriteFile()
+com! -nargs=0                         W call SudoWriteFile()
 
 " Enable opening a file using vim
-com! -nargs=+ -complete=file         Open call OpenFunction(<f-args>)
+com! -nargs=+ -complete=file          Open call OpenFunction(<f-args>)
 
 " Unixy things
-com! -nargs=+ -complete=file         Rm call DeleteThisFile(<f-args>)
-com! -nargs=* -complete=file         Ls echo system('ls --color=auto <f-args>')
-com! -nargs=* -complete=file         Wc call WordCount(<f-args>)
+com! -nargs=+ -complete=file          Rm call DeleteThisFile(<f-args>)
+com! -nargs=* -complete=file          Ls echo system('ls --color=auto <f-args>')
+com! -nargs=* -complete=file          Wc call WordCount(<f-args>)
 
 "====[ Open any file with a pre-existing swapfile in readonly mode ]===="
 augroup NoSimultaneousEdits
