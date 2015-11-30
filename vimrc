@@ -479,9 +479,9 @@ endfunction
 function! MakeExecutable(...)
   if has('unix')
     if a:0 == 0
-      l:fnames = expand('%:p')
+      let l:fnames = expand('%:p')
     else
-      l:fnames = join(a:000) " Joins with a space
+      let l:fnames = join(a:000) " Joins with a space
     endif
     let l:oldautoread = &l:autoread
     setlocal autoread
