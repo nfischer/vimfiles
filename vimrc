@@ -37,6 +37,7 @@ set incsearch                " searches as you type
 set ignorecase smartcase     " case insensitive for all-lower searches
 set t_Co=256
 set t_ut=
+set background=dark
 colorscheme fischer_dark
 syntax on
 nohl                         " Default = don't highlight
@@ -48,19 +49,25 @@ if s:os ==# 'windows'
   set rtp+=~/vimfiles/bundle/Vundle.vim/
 else
   set rtp+=~/.vim/bundle/Vundle.vim/
+  " set rtp+=~/programming/Vundle.vim/
 endif
 
 call vundle#begin()
-" Plugin 'VundleVim/Vundle.vim'
+Plugin 'VundleVim/Vundle.vim'
 Plugin 'bling/vim-airline'
 Plugin 'chrisbra/vim-diff-enhanced'
 Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'google/vim-codefmt'
 Plugin 'google/vim-glaive'
 Plugin 'google/vim-maktaba'
+Plugin 'heavenshell/vim-pydocstring'
+" Plugin 'klen/python-mode'
+" Plugin 'moll/vim-node'
 Plugin 'nfischer/vim-marker', {'pinned': 1}
+Plugin 'nfischer/vim-ohm', {'pinned': 1}
 Plugin 'nfischer/vim-vimignore'
 Plugin 'rgrinberg/vim-ocaml'
+Plugin 'roryokane/detectindent'
 Plugin 'scrooloose/syntastic'
 Plugin 'tmux-plugins/vim-tmux'
 Plugin 'tpope/vim-abolish'
@@ -76,6 +83,8 @@ Plugin 'wlangstroth/vim-racket'
 " Plugin 'syngan/vim-vimlint'
 call vundle#end()
 
+let g:pydocstring_enable_mapping = 0
+
 " Airline settings
 set laststatus=2
 
@@ -86,7 +95,6 @@ let &diffexpr='EnhancedDiff#Diff("git diff", "--diff-algorithm=patience")'
 runtime ftplugin/man.vim
 filetype plugin on
 
-" Fugitive settings
 augroup FileTypeOptions
   " Configure comment patterns and other things
   autocmd!
@@ -95,12 +103,22 @@ augroup FileTypeOptions
   autocmd FileType vim                      setlocal commentstring=\"\ %s
   autocmd FileType gitcommit,markdown       setlocal spell
   autocmd FileType scheme                   setlocal lisp
+  autocmd BufNewFile,BufReadPost *.ohm      set      filetype=ohm
 augroup END
+
+" DetectIndent settings
+augroup DetectIndent
+   autocmd!
+   autocmd BufReadPost * DetectIndent
+augroup END
+
+" Fugitive settings
 nnoremap <silent> <leader>gs :<C-u>Gstatus<CR>
 nnoremap <silent> <leader>ga :<C-u>Gwrite<CR>
 nnoremap <silent> <leader>gc :<C-u>Gcommit<CR>
 nnoremap <silent> <leader>gp :<C-u>Gpush<CR>
 nnoremap <silent> <leader>gd :<C-u>Gdiff<CR>
+nnoremap <silent> <leader>gh :<C-u>Gdiff HEAD<CR>
 nnoremap <silent> <leader>gb :<C-u>Gblame<CR>
 nnoremap <silent> <leader>gi :<C-u>GEditIgnore<CR>
 set diffopt=vertical
@@ -120,8 +138,8 @@ nnoremap <silent> <Right>   :TmuxNavigateRight<cr>
 let g:syntastic_mode_map = { 'mode': 'passive' }
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
-let g:syntastic_auto_loc_list = 1
 let g:syntastic_always_populate_loc_list = 1
+" let g:syntastic_auto_loc_list = 1
 " set statusline+=%#warningmsg#
 " set statusline+=%{SyntasticStatuslineFlag()}
 " set statusline+=%*
@@ -485,7 +503,7 @@ function! MakeExecutable(...)
     endif
     let l:oldautoread = &l:autoread
     setlocal autoread
-    call system('chmod 755 ' . l:fnames)
+    call system('chmod +x ' . l:fnames)
     checktime
     let &l:autoread = l:oldautoread
   else
@@ -611,6 +629,7 @@ endfunction
 
 "==== Leader mappings ===="
 
+nnoremap          <leader>sq ciwsquash<Esc>b
 nnoremap          <leader>bu :b<Space>
 nnoremap          <leader>rf :RenameToken <C-r><C-w><space>
 vnoremap          <leader>rf :RenameToken<space>
@@ -623,9 +642,9 @@ noremap  <silent> <leader>ev :<C-u>call EditConfigFile($MYVIMRC)<CR>
 noremap  <silent> <leader>eb :<C-u>call EditConfigFile(expand('~/.bashrc'))<CR>
 noremap  <silent> <leader>et :<C-u>call
     \ EditConfigFile(expand('~/.tmux.conf'))<CR>
+noremap  <silent> <leader>ep :<C-u>call EditConfigFile(expand('~/.profile'))<CR>
 noremap  <silent> <leader>sv :<C-u>source $MYVIMRC<CR>
-noremap  <silent> <leader>eh :<C-u>exe 'vsp ' . expand('<cfile>')<CR>
-map      <silent> <leader>ef <leader>eh
+noremap  <silent> <leader>ef :<C-u>exe 'vsp ' . expand('<cfile>')<CR>
 noremap  <silent> <leader>ec :<C-u>exe 'vsp ' . expand('<cfile>:r') . '.c'<CR>
 
 noremap  <silent> <leader>rm :call DeleteThisFile()<CR>
