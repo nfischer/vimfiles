@@ -53,19 +53,25 @@ else
 endif
 
 call vundle#begin()
+Plugin 'Valloric/MatchTagAlways'
 Plugin 'VundleVim/Vundle.vim'
+Plugin 'KabbAmine/gulp-vim'
+Plugin 'alunny/pegjs-vim'
+Plugin 'alvan/vim-closetag'
 Plugin 'bling/vim-airline'
 Plugin 'chrisbra/vim-diff-enhanced'
 Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'google/vim-codefmt'
+Plugin 'google/vim-codereview'
 Plugin 'google/vim-glaive'
 Plugin 'google/vim-maktaba'
 Plugin 'heavenshell/vim-pydocstring'
 " Plugin 'klen/python-mode'
-" Plugin 'moll/vim-node'
+Plugin 'moll/vim-node'
 Plugin 'nfischer/vim-marker', {'pinned': 1}
 Plugin 'nfischer/vim-ohm', {'pinned': 1}
 Plugin 'nfischer/vim-vimignore'
+Plugin 'pangloss/vim-javascript'
 Plugin 'rgrinberg/vim-ocaml'
 Plugin 'roryokane/detectindent'
 Plugin 'scrooloose/syntastic'
@@ -103,8 +109,8 @@ augroup FileTypeOptions
   autocmd FileType vim                      setlocal commentstring=\"\ %s
   autocmd FileType gitcommit,markdown       setlocal spell
   autocmd FileType scheme                   setlocal lisp
-  autocmd BufNewFile,BufReadPost *.ohm      set      filetype=ohm
 augroup END
+
 
 " DetectIndent settings
 augroup DetectIndent
@@ -113,14 +119,18 @@ augroup DetectIndent
 augroup END
 
 " Fugitive settings
-nnoremap <silent> <leader>gs :<C-u>Gstatus<CR>
-nnoremap <silent> <leader>ga :<C-u>Gwrite<CR>
-nnoremap <silent> <leader>gc :<C-u>Gcommit<CR>
-nnoremap <silent> <leader>gp :<C-u>Gpush<CR>
-nnoremap <silent> <leader>gd :<C-u>Gdiff<CR>
-nnoremap <silent> <leader>gh :<C-u>Gdiff HEAD<CR>
-nnoremap <silent> <leader>gb :<C-u>Gblame<CR>
-nnoremap <silent> <leader>gi :<C-u>GEditIgnore<CR>
+nnoremap <silent> <leader>gs  :<C-u>Gstatus<CR>
+nnoremap <silent> <leader>ga  :<C-u>Gwrite<CR>
+nnoremap <silent> <leader>gc  :<C-u>Gcommit<CR>
+nnoremap <silent> <leader>gps :<C-u>Gpush<CR>
+nnoremap <silent> <leader>gd  :<C-u>Gdiff<CR>
+nnoremap <silent> <leader>ghh :<C-u>Gdiff HEAD<CR>
+nnoremap <silent> <leader>gH  :<C-u>Gdiff HEAD<CR>
+nnoremap <silent> <leader>gh1 :<C-u>Gdiff HEAD~1<CR>
+nnoremap          <leader>gh  :<C-u>Gdiff HEAD~
+nnoremap <silent> <leader>gpc :<C-u>Git pc<CR>
+nnoremap <silent> <leader>gb  :<C-u>Gblame<CR>
+nnoremap <silent> <leader>gi  :<C-u>GEditIgnore<CR>
 set diffopt=vertical
 
 " Vundle mappings
@@ -278,6 +288,7 @@ inoremap <C-l> <Esc>[s1z=`]a
 "==== Instantly Better Vim additions ===="
 
 "====[ Make the 81st column stand out ]===="
+
 hi ColorColumn  gui=bold guifg=black guibg=magenta cterm=bold ctermfg=black
    \ ctermbg=magenta
 augroup HilightColumn
@@ -286,8 +297,8 @@ augroup HilightColumn
 augroup END
 
 "====[ Highlight matches when jumping to next ]===="
-nnoremap <silent> n   n:call HLNext(0.15)<CR>
-nnoremap <silent> N   N:call HLNext(0.15)<CR>
+" nnoremap <silent> n   n:call HLNext(0.15)<CR>
+" nnoremap <silent> N   N:call HLNext(0.15)<CR>
 nnoremap <silent> '   :call HLGoto(0.15)<CR>
 nnoremap ` '
 
@@ -322,7 +333,7 @@ function! HLGoto(blinktime)
     exe 'normal! `' . l:c
   catch /.*/
     let l:msg = substitute(v:exception, '\m\C^Vim(.*):\(.*\)$', '\1', '')
-    echohl ErrorMsg | echo l:msg | echohl none
+    echohl ErrorMsg | echo l:msg | echohl NONE
     return
   endtry
   " Blink
@@ -367,6 +378,64 @@ function! HowLong(number_of_times, ...)
 endfunction
 
 "==== Leader functions ===="
+
+function! ToggleTest() " for ShellJS/cash
+  if getcwd() =~ 'src/commands'
+    cd ..
+    let l:new_dir = 'test'
+  elseif getcwd() =~ 'src'
+    let l:new_dir = 'test'
+  elseif getcwd() =~ 'test'
+    let l:new_dir = 'src'
+    if isdirectory('../src/commands/')
+      let l:new_dir = l:new_dir . '/commands'
+    endif
+  else
+    " error
+    echohl ErrorMsg | echo "Can't find your directory" | echohl NONE
+    return 1
+  endif
+  exe 'edit ../' . l:new_dir . '/' . expand('%:t')
+endfunction
+
+function! GenerateDocs() " for ShellJS
+  let l:old_cwd = getcwd()
+  while !isdirectory('scripts/')
+    cd ..
+    let l:new_cwd = getcwd()
+    if l:new_cwd == l:old_cwd
+      echohl ErrorMsg | echo 'Unable to find scripts/ dir' | echohl NONE
+      return 1
+    endif
+    let l:old_cwd = l:new_cwd
+  endwhile
+  !scripts/generate-docs.js
+endfunction
+
+function! Transpile()
+  function! RefreshOutputBuf(content)
+  endfunction
+  let l:js_output = system('node bin/transpile.js input.sh')
+  let l:old_frame = winnr()
+  let l:old_syn = &syntax
+  if !bufloaded('OUTPUT')
+    " Create a new scratch buffer
+    silent botright vnew OUTPUT
+    setlocal buftype=nofile
+    setlocal bufhidden=delete
+    setlocal noswapfile
+    set filetype=javascript
+  else
+    let l:output_win = winnr('$')
+    exe l:output_win . 'wincmd w'
+  endif
+  normal! ggdG
+  put!=l:js_output
+  exe l:old_frame . 'wincmd w'
+  if !empty(&syntax)
+    syntax on
+  endif
+endfunction
 
 function! RenameTokenFunction(orig, new) range
   if a:orig ==# a:new
@@ -629,6 +698,10 @@ endfunction
 
 "==== Leader mappings ===="
 
+nnoremap <silent> <leader>tt :call ToggleTest()<CR>
+nnoremap <silent> <leader>gl :Gulp<CR>
+nnoremap <silent> <leader>nt :!npm test<CR>
+nnoremap <silent> <leader>tp :call Transpile()<CR>
 nnoremap          <leader>sq ciwsquash<Esc>b
 nnoremap          <leader>bu :b<Space>
 nnoremap          <leader>rf :RenameToken <C-r><C-w><space>
@@ -671,6 +744,30 @@ nnoremap <silent> <leader>3  :Header 3<CR>
 nnoremap <silent> <leader>4  :Header 4<CR>
 
 "==== Custom Commands ===="
+
+command! -nargs=0 Yank normal! ggVG"+y``
+command! -nargs=0 Blast normal! ggVG"+p
+command! -nargs=0 Gendocs call GenerateDocs()
+command! -complete=shellcmd -nargs=+ Shell call s:RunShellCommand(<q-args>)
+function! s:RunShellCommand(cmdline)
+  echo a:cmdline
+  let expanded_cmdline = a:cmdline
+  for part in split(a:cmdline, ' ')
+     if part[0] =~ '\v[%#<]'
+        let expanded_part = fnameescape(expand(part))
+        let expanded_cmdline = substitute(expanded_cmdline, part, expanded_part, '')
+     endif
+  endfor
+  botright vnew
+  setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap
+  call setline(1, 'You entered:    ' . a:cmdline)
+  call setline(2, 'Expanded Form:  ' .expanded_cmdline)
+  call setline(3,substitute(getline(2),'.','=','g'))
+  execute '$read !'. expanded_cmdline
+  setlocal nomodifiable
+  1
+endfunction
+
 
 com! -nargs=0                         LongLines call setreg('/', '\m^.\{81,}$')|
     \ echo 'press n to go to the next long line'
