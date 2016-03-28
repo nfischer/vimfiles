@@ -25,7 +25,7 @@ set autoindent
 set smartindent
 set splitbelow
 set virtualedit=block        " makes virtual blocks cleaner and blockier
-set history=1000
+set history=10000
 set undolevels=1000
 set wildignore=*.swp,*.bak,*.pyc,*.class,*.o,*.obj
 set lazyredraw
@@ -78,7 +78,7 @@ Plugin 'scrooloose/syntastic'
 Plugin 'tmux-plugins/vim-tmux'
 Plugin 'tpope/vim-abolish'
 Plugin 'tpope/vim-commentary'
-Plugin 'tpope/vim-fugitive'
+Plugin 'tpope/vim-fugitive' | let s:fugitive_loaded = 1
 Plugin 'tpope/vim-repeat'
 Plugin 'tpope/vim-surround'
 Plugin 'wlangstroth/vim-racket'
@@ -114,24 +114,26 @@ augroup END
 
 " DetectIndent settings
 augroup DetectIndent
-   autocmd!
-   autocmd BufReadPost * DetectIndent
+  autocmd!
+  autocmd BufReadPost * DetectIndent
 augroup END
 
 " Fugitive settings
-nnoremap <silent> <leader>gs  :<C-u>Gstatus<CR>
-nnoremap <silent> <leader>ga  :<C-u>Gwrite<CR>
-nnoremap <silent> <leader>gc  :<C-u>Gcommit<CR>
-nnoremap <silent> <leader>gps :<C-u>Gpush<CR>
-nnoremap <silent> <leader>gd  :<C-u>Gdiff<CR>
-nnoremap <silent> <leader>ghh :<C-u>Gdiff HEAD<CR>
-nnoremap <silent> <leader>gH  :<C-u>Gdiff HEAD<CR>
-nnoremap <silent> <leader>gh1 :<C-u>Gdiff HEAD~1<CR>
-nnoremap          <leader>gh  :<C-u>Gdiff HEAD~
-nnoremap <silent> <leader>gpc :<C-u>Git pc<CR>
-nnoremap <silent> <leader>gb  :<C-u>Gblame<CR>
-nnoremap <silent> <leader>gi  :<C-u>GEditIgnore<CR>
-set diffopt=vertical
+if exists('s:fugitive_loaded')
+  nnoremap <silent> <leader>gs  :<C-u>Gstatus<CR>
+  nnoremap <silent> <leader>ga  :<C-u>Gwrite<CR>
+  nnoremap <silent> <leader>gc  :<C-u>Gcommit<CR>
+  nnoremap <silent> <leader>gps :<C-u>Gpush<CR>
+  nnoremap <silent> <leader>gd  :<C-u>Gdiff<CR>
+  nnoremap <silent> <leader>ghh :<C-u>Gdiff HEAD<CR>
+  nnoremap <silent> <leader>gH  :<C-u>Gdiff HEAD<CR>
+  nnoremap <silent> <leader>gh1 :<C-u>Gdiff HEAD~1<CR>
+  nnoremap          <leader>gh  :<C-u>Gdiff HEAD~
+  nnoremap <silent> <leader>gpc :<C-u>Git pc<CR>
+  nnoremap <silent> <leader>gb  :<C-u>Gblame<CR>
+  nnoremap <silent> <leader>gi  :<C-u>GEditIgnore<CR>
+  set diffopt=vertical
+endif
 
 " Vundle mappings
 nnoremap <silent> <leader>vu :<C-u>PluginInstall!<CR>
@@ -400,6 +402,7 @@ endfunction
 
 function! GenerateDocs() " for ShellJS
   let l:old_cwd = getcwd()
+  let l:start_dir = l:old_cwd
   while !isdirectory('scripts/')
     cd ..
     let l:new_cwd = getcwd()
@@ -410,6 +413,7 @@ function! GenerateDocs() " for ShellJS
     let l:old_cwd = l:new_cwd
   endwhile
   !scripts/generate-docs.js
+  exe 'cd ' . l:start_dir
 endfunction
 
 function! Transpile()
@@ -713,6 +717,7 @@ nnoremap <silent> <leader>qf :<C-u>cwindow<CR>
 nnoremap <silent> <leader>C  :let &scrolloff=999-&scrolloff<CR>
 noremap  <silent> <leader>ev :<C-u>call EditConfigFile($MYVIMRC)<CR>
 noremap  <silent> <leader>eb :<C-u>call EditConfigFile(expand('~/.bashrc'))<CR>
+noremap  <silent> <leader>ez :<C-u>call EditConfigFile(expand('~/.zshrc'))<CR>
 noremap  <silent> <leader>et :<C-u>call
     \ EditConfigFile(expand('~/.tmux.conf'))<CR>
 noremap  <silent> <leader>ep :<C-u>call EditConfigFile(expand('~/.profile'))<CR>
@@ -794,7 +799,7 @@ com! -nargs=+ -complete=file          Open call OpenFunction(<f-args>)
 
 " Unixy things
 com! -nargs=+ -complete=file          Rm call DeleteThisFile(<f-args>)
-com! -nargs=* -complete=file          Ls echo system('ls --color=auto <f-args>')
+com! -nargs=* -complete=file          Ls echo system('ls --color=auto ' . <f-args>)
 com! -nargs=* -complete=file          Wc call WordCount(<f-args>)
 
 "====[ Open any file with a pre-existing swapfile in readonly mode ]===="
