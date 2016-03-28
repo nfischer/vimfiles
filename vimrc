@@ -49,11 +49,16 @@ if s:os ==# 'windows'
   set rtp+=~/vimfiles/bundle/Vundle.vim/
 else
   set rtp+=~/.vim/bundle/Vundle.vim/
-  " set rtp+=~/programming/Vundle.vim/
 endif
 
 call vundle#begin()
-Plugin 'Valloric/MatchTagAlways'
+if has('python')
+  Plugin 'Valloric/MatchTagAlways'
+  Plugin 'google/vim-codefmt'
+  Plugin 'google/vim-codereview'
+  Plugin 'google/vim-glaive'
+  Plugin 'google/vim-maktaba'
+endif
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'KabbAmine/gulp-vim'
 Plugin 'alunny/pegjs-vim'
@@ -61,10 +66,6 @@ Plugin 'alvan/vim-closetag'
 Plugin 'bling/vim-airline'
 Plugin 'chrisbra/vim-diff-enhanced'
 Plugin 'christoomey/vim-tmux-navigator'
-Plugin 'google/vim-codefmt'
-Plugin 'google/vim-codereview'
-Plugin 'google/vim-glaive'
-Plugin 'google/vim-maktaba'
 Plugin 'heavenshell/vim-pydocstring'
 " Plugin 'klen/python-mode'
 Plugin 'moll/vim-node'
