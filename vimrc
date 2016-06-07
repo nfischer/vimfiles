@@ -11,37 +11,46 @@ endif
 
 let g:mapleader = ','
 
-set nocompatible             " be iMproved!
-set nobackup                 " no annoying file.txt~ files
-set modelines=0              " Security reasons
+set nocompatible            " be iMproved!
+
 set autochdir
-set showcmd
-set ttimeoutlen=200          " Exit insert mode quickly
-set timeoutlen=1000          " But still give me time to enter leader commands
-set scrolloff=4              " keep at least 4 lines above/below
-set sidescrolloff=4          " keep at least 4 lines left/right
-set textwidth=80
 set autoindent
+set background=dark
+set backspace=indent,eol,start
+set diffopt=filler,vertical
+set gdefault                " Add g flag to search/replace
+set hidden                  " Buffers finally don't suck
+set history=10000
+set hlsearch                " highlights search results
+set ignorecase smartcase    " case insensitive for all-lower searches
+set incsearch               " searches as you type
+set lazyredraw
+set modelines=0             " Security reasons
+set nobackup                " no annoying file.txt~ files
+set nojoinspaces            " Only insert a single space after punctuation
+set noshowmode              " Handled by airline
+set number numberwidth=1
+set ruler
+set scrolloff=4             " keep at least 4 lines above/below
+set showcmd
+set sidescrolloff=4         " keep at least 4 lines left/right
 set smartindent
 set splitbelow
-set virtualedit=block        " makes virtual blocks cleaner and blockier
-set history=10000
-set undolevels=1000
-set wildignore=*.swp,*.bak,*.pyc,*.class,*.o,*.obj
-set lazyredraw
-set ruler
-set number numberwidth=1
-set backspace=indent,eol,start
-set hlsearch                 " highlights search results
-set incsearch                " searches as you type
-set ignorecase smartcase     " case insensitive for all-lower searches
 set t_Co=256
 set t_ut=
-set background=dark
-colorscheme fischer_dark
-syntax on
-nohl                         " Default = don't highlight
+set textwidth=80
+set timeoutlen=1000         " But still give me time to enter leader commands
+set ttimeoutlen=200         " Exit insert mode quickly
+set undolevels=1000
+set virtualedit=block       " makes virtual blocks cleaner and blockier
+set wildignore+=.DS_Store,*.swp,*.bak,*.pyc,*.class,*.o,*.obj
 
+colorscheme fischer
+syntax on
+nohl                        " Default = don't highlight
+
+" Highlight VCS conflict markers
+match ErrorMsg '^\(<\|=\|>\)\{7\}\([^=].\+\)\?$'
 
 "==== Vundle ===="
 filetype off
@@ -61,16 +70,22 @@ if has('python')
 endif
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'KabbAmine/gulp-vim'
+" Plugin 'altercation/vim-colors-solarized'
 Plugin 'alunny/pegjs-vim'
 Plugin 'alvan/vim-closetag'
-Plugin 'bling/vim-airline'
+Plugin 'chrisbra/unicode.vim'
 Plugin 'chrisbra/vim-diff-enhanced'
 Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'heavenshell/vim-pydocstring'
+Plugin 'junegunn/vim-emoji'
 " Plugin 'klen/python-mode'
+Plugin 'luochen1990/rainbow'
+Plugin 'mattn/webapi-vim'
 Plugin 'moll/vim-node'
 Plugin 'nfischer/vim-marker', {'pinned': 1}
-Plugin 'nfischer/vim-ohm', {'pinned': 1}
+Plugin 'nfischer/vim-ohm'
+Plugin 'nfischer/vim-potigol', {'pinned': 1}
+Plugin 'nfischer/vim-rainbows', {'pinned': 1}
 Plugin 'nfischer/vim-vimignore'
 Plugin 'pangloss/vim-javascript'
 Plugin 'rgrinberg/vim-ocaml'
@@ -82,6 +97,8 @@ Plugin 'tpope/vim-commentary'
 Plugin 'tpope/vim-fugitive' | let s:fugitive_loaded = 1
 Plugin 'tpope/vim-repeat'
 Plugin 'tpope/vim-surround'
+" Plugin 'w0ng/vim-hybrid'
+Plugin 'vim-airline/vim-airline'
 Plugin 'wlangstroth/vim-racket'
 " Plugin 'airblade/vim-gitgutter'
 " Plugin 'ap/vim-buftabline'
@@ -90,6 +107,36 @@ Plugin 'wlangstroth/vim-racket'
 " Plugin 'syngan/vim-vimlint'
 call vundle#end()
 
+" let g:solarized_termcolors=256
+" colorscheme hybrid
+
+" Rainbows-lang ftplugin
+let g:rainbows#inferencer_path = '/home/nate/programming/rainbows/bin/rain-infer.js'
+
+" Rainbow parens
+let g:rainbow_active = 0
+let g:rainbow_conf = {
+    \   'guifgs': ['royalblue3', 'darkorange3', 'seagreen3', 'firebrick'],
+    \   'ctermfgs': ['lightblue', 'lightyellow', 'lightcyan', 'lightmagenta'],
+    \   'operators': '_,_',
+    \   'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold'],
+    \   'separately': {
+    \       '*': {},
+    \       'tex': {
+    \           'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/'],
+    \       },
+    \       'lisp': {
+    \           'guifgs': ['royalblue3', 'darkorange3', 'seagreen3', 'firebrick', 'darkorchid3'],
+    \       },
+    \       'vim': {
+    \           'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/', 'start=/{/ end=/}/ fold', 'start=/(/ end=/)/ containedin=vimFuncBody', 'start=/\[/ end=/\]/ containedin=vimFuncBody', 'start=/{/ end=/}/ fold containedin=vimFuncBody'],
+    \       },
+    \       'html': {
+    \           'parentheses': ['start=/\v\<((area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)[ >])@!\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'|[^ '."'".'"><=`]*))?)*\>/ end=#</\z1># fold'],
+    \       },
+    \       'css': 0,
+    \   }
+    \}
 let g:pydocstring_enable_mapping = 0
 
 " Airline settings
@@ -133,7 +180,6 @@ if exists('s:fugitive_loaded')
   nnoremap <silent> <leader>gpc :<C-u>Git pc<CR>
   nnoremap <silent> <leader>gb  :<C-u>Gblame<CR>
   nnoremap <silent> <leader>gi  :<C-u>GEditIgnore<CR>
-  set diffopt=vertical
 endif
 
 " Vundle mappings
@@ -381,6 +427,34 @@ function! HowLong(number_of_times, ...)
 endfunction
 
 "==== Leader functions ===="
+
+function! AlphaArgs(num)
+  let l:alpha_args = join(split('abcdefghijklmnopqrstuvwxyz', '\zs')[0:a:num-1], ', ')
+  exe 'normal! ci)' . l:alpha_args
+endfunction
+
+" Let's insert some line numbers (explicitly in the text)
+function! Numberify()
+  let l:num = getpos('.')[1]
+  exe 'normal! I' . l:num . '. '
+endfunction
+
+function! DecreaseLineNums(...)
+  if exists('a:1')
+    let l:dec_count = a:1
+  else
+    let l:dec_count = 1
+  endif
+  if l:dec_count < 0
+    let l:dec_count = l:dec_count * -1
+    let l:cmd = "\<C-a>"
+  else
+    let l:cmd = "\<C-x>"
+  endif
+  for k in range(l:dec_count)
+    exe 'normal! 0' . l:cmd
+  endfor
+endfunction
 
 function! ToggleTest() " for ShellJS/cash
   if getcwd() =~ 'src/commands'
@@ -717,6 +791,7 @@ nnoremap          <leader>vg :vimgrep<Space><C-r><C-W><Space>*<CR>
 nnoremap <silent> <leader>qf :<C-u>cwindow<CR>
 nnoremap <silent> <leader>C  :let &scrolloff=999-&scrolloff<CR>
 noremap  <silent> <leader>ev :<C-u>call EditConfigFile($MYVIMRC)<CR>
+noremap  <silent> <leader>ea :<C-u>call EditConfigFile(expand('~/.shell_aliases'))<CR>
 noremap  <silent> <leader>eb :<C-u>call EditConfigFile(expand('~/.bashrc'))<CR>
 noremap  <silent> <leader>ez :<C-u>call EditConfigFile(expand('~/.zshrc'))<CR>
 noremap  <silent> <leader>et :<C-u>call
@@ -751,6 +826,8 @@ nnoremap <silent> <leader>4  :Header 4<CR>
 
 "==== Custom Commands ===="
 
+command! -nargs=1 Alpha call AlphaArgs(<f-args>)
+command! -complete=file -nargs=1 Browser !chromium-browser <args> &>/dev/null &
 command! -nargs=0 Yank normal! ggVG"+y``
 command! -nargs=0 Blast normal! ggVG"+p
 command! -nargs=0 Gendocs call GenerateDocs()
