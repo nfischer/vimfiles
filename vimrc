@@ -3,10 +3,13 @@
 "==== System Information ===="
 if has('win32') || has('win16')
   let s:os = 'windows'
+  let s:VIMFILES = $HOME . '/vimfiles'
 elseif has('unix')
   let s:os = substitute(system('uname'), '\n', '', '')
+  let s:VIMFILES = $HOME . '/.vim'
 else
   let s:os = 'undefined'
+  let s:VIMFILES = $HOME . '/.vim'
 endif
 
 let g:mapleader = ','
@@ -54,11 +57,12 @@ match ErrorMsg '^\(<\|=\|>\)\{7\}\([^=].\+\)\?$'
 
 "==== Vundle ===="
 filetype off
-if s:os ==# 'windows'
-  set rtp+=~/vimfiles/bundle/Vundle.vim/
-else
-  set rtp+=~/.vim/bundle/Vundle.vim/
-endif
+" if s:os ==# 'windows'
+"   set rtp+=~/vimfiles/bundle/Vundle.vim/
+" else
+"   set rtp+=~/.vim/bundle/Vundle.vim/
+" endif
+exe 'set rtp+=' . s:VIMFILES . '/bundle/Vundle.vim/'
 
 call vundle#begin()
 if has('python')
@@ -91,6 +95,7 @@ Plugin 'pangloss/vim-javascript'
 Plugin 'rgrinberg/vim-ocaml'
 Plugin 'roryokane/detectindent'
 Plugin 'scrooloose/syntastic'
+Plugin 'ternjs/tern_for_vim'
 Plugin 'tmux-plugins/vim-tmux'
 Plugin 'tpope/vim-abolish'
 Plugin 'tpope/vim-commentary'
@@ -955,6 +960,12 @@ nmap         ++  vip++
 " Move a single char left or right
 nmap  <expr>  <C-LEFT>   MoveChar('left')
 nmap  <expr>  <C-RIGHT>  MoveChar('right')
+
+"==== Skeleton/template files ===="
+augroup Skeleton
+  autocmd!
+  autocmd BufNewFile * silent! exe '0r ' . s:VIMFILES . '/templates/skeleton.' . &ft | set modified
+augroup END
 
 "==== Reload vimrc whenever it's saved ===="
 augroup ConfigReload
