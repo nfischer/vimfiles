@@ -3,6 +3,10 @@
 # Install & update all bundled vim plugins asynchronously
 
 cd "$(dirname $0)"
+
+# First, make sure we have the .vim/tmp & .vim/spell folders
+mkdir -p tmp/ spell/
+
 BUNDLE_PATH="$(dirname $0)/bundle"
 
 declare -a pids
