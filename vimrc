@@ -99,6 +99,7 @@ Plugin 'ternjs/tern_for_vim'
 Plugin 'tmux-plugins/vim-tmux'
 Plugin 'tpope/vim-abolish'
 Plugin 'tpope/vim-commentary'
+Plugin 'tpope/vim-dispatch'
 Plugin 'tpope/vim-fugitive' | let s:fugitive_loaded = 1
 Plugin 'tpope/vim-repeat'
 Plugin 'tpope/vim-surround'
@@ -257,8 +258,7 @@ augroup END
 
 if has('gui_running')
   " GUI specific
-  set visualbell
-  set t_vb=
+  set noerrorbells visualbell t_vb=
   set guioptions=T
 
   " Select columns better with gg & G in visual mode
@@ -963,14 +963,26 @@ nmap  <expr>  <C-RIGHT>  MoveChar('right')
 
 "==== Skeleton/template files ===="
 augroup Skeleton
+  function! s:LoadSkeleton()
+    let l:fname = s:VIMFILES . '/templates/skeleton.' . &ft
+    if filereadable(l:fname)
+      silent! exe '0r ' . l:fname | setlocal modified
+    endif
+  endfunction
   autocmd!
-  autocmd BufNewFile * silent! exe '0r ' . s:VIMFILES . '/templates/skeleton.' . &ft | set modified
+  autocmd BufNewFile * call s:LoadSkeleton()
 augroup END
 
 "==== Reload vimrc whenever it's saved ===="
 augroup ConfigReload
   autocmd!
   autocmd BufWritePost $MYVIMRC source $MYVIMRC
+augroup END
+
+"==== No damn blinking lights! ===="
+augroup ErrorBells
+  autocmd!
+  autocmd GUIEnter * set vb t_vb=
 augroup END
 
 set nocursorcolumn
