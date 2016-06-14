@@ -1,6 +1,9 @@
+" vim: set foldmethod=marker foldlevel=0:
 " Vimrc and gVimrc file
 
-"==== System Information ===="
+" =============================================================================
+" System Information {{{
+" =============================================================================
 if has('win32') || has('win16')
   let s:os = 'windows'
   let s:VIMFILES = $HOME . '/vimfiles'
@@ -11,9 +14,13 @@ else
   let s:os = 'undefined'
   let s:VIMFILES = $HOME . '/.vim'
 endif
+" }}}
 
 let g:mapleader = ','
 
+" =============================================================================
+" Settings {{{
+" =============================================================================
 set nocompatible            " be iMproved!
 
 set autochdir
@@ -21,6 +28,8 @@ set autoindent
 set background=dark
 set backspace=indent,eol,start
 set diffopt=filler,vertical
+set foldlevel=0
+set foldmethod=marker
 set gdefault                " Add g flag to search/replace
 set hidden                  " Buffers finally don't suck
 set history=10000
@@ -48,6 +57,8 @@ set undolevels=1000
 set virtualedit=block       " makes virtual blocks cleaner and blockier
 set wildignore+=.DS_Store,*.swp,*.bak,*.pyc,*.class,*.o,*.obj
 
+" }}}
+
 colorscheme fischer
 syntax on
 nohl                        " Default = don't highlight
@@ -55,7 +66,9 @@ nohl                        " Default = don't highlight
 " Highlight VCS conflict markers
 match ErrorMsg '^\(<\|=\|>\)\{7\}\([^=].\+\)\?$'
 
-"==== Vundle ===="
+" =============================================================================
+" Vundle {{{
+" =============================================================================
 filetype off
 " if s:os ==# 'windows'
 "   set rtp+=~/vimfiles/bundle/Vundle.vim/
@@ -112,6 +125,10 @@ Plugin 'wlangstroth/vim-racket'
 " Plugin 'hsanson/vim-android'
 " Plugin 'syngan/vim-vimlint'
 call vundle#end()
+" }}}
+" =============================================================================
+" Plugin settings {{{
+" =============================================================================
 
 " let g:solarized_termcolors=256
 " colorscheme hybrid
@@ -208,6 +225,8 @@ let g:syntastic_always_populate_loc_list = 1
 " set statusline+=%#warningmsg#
 " set statusline+=%{SyntasticStatuslineFlag()}
 " set statusline+=%*
+
+" }}}
 
 "==== Indentation and word wrapping ===="
 if !exists('s:has_set_indent')
@@ -431,7 +450,9 @@ function! HowLong(number_of_times, ...)
   return l:result
 endfunction
 
-"==== Leader functions ===="
+" =============================================================================
+" Leader functions {{{
+" =============================================================================
 
 function! AlphaArgs(num)
   let l:alpha_args = join(split('abcdefghijklmnopqrstuvwxyz', '\zs')[0:a:num-1], ', ')
@@ -780,7 +801,10 @@ function! WordCount(...)
   endif
 endfunction
 
-"==== Leader mappings ===="
+" }}}
+" =============================================================================
+" Leader mappings {{{
+" =============================================================================
 
 nnoremap <silent> <leader>tt :call ToggleTest()<CR>
 nnoremap <silent> <leader>gl :Gulp<CR>
@@ -829,7 +853,10 @@ nnoremap <silent> <leader>bo :call DrawBox()<CR>
 nnoremap <silent> <leader>3  :Header 3<CR>
 nnoremap <silent> <leader>4  :Header 4<CR>
 
-"==== Custom Commands ===="
+" }}}
+" =============================================================================
+" Custom Commands {{{
+" =============================================================================
 
 command! -nargs=1 Alpha call AlphaArgs(<f-args>)
 command! -complete=file -nargs=1 Browser !chromium-browser <args> &>/dev/null &
@@ -884,6 +911,8 @@ com! -nargs=+ -complete=file          Open call OpenFunction(<f-args>)
 com! -nargs=+ -complete=file          Rm call DeleteThisFile(<f-args>)
 com! -nargs=* -complete=file          Ls echo system('ls --color=auto ' . <f-args>)
 com! -nargs=* -complete=file          Wc call WordCount(<f-args>)
+
+" }}}
 
 "====[ Open any file with a pre-existing swapfile in readonly mode ]===="
 augroup NoSimultaneousEdits
@@ -961,6 +990,10 @@ nmap         ++  vip++
 nmap  <expr>  <C-LEFT>   MoveChar('left')
 nmap  <expr>  <C-RIGHT>  MoveChar('right')
 
+" =============================================================================
+" Autocommands {{{
+" =============================================================================
+
 "==== Skeleton/template files ===="
 augroup Skeleton
   function! s:LoadSkeleton()
@@ -984,5 +1017,12 @@ augroup ErrorBells
   autocmd!
   autocmd GUIEnter * set vb t_vb=
 augroup END
+
+" }}}
+
+let s:local_vimrc = $HOME . '/.vimrc-local'
+if filereadable(s:local_vimrc)
+  execute 'source' s:local_vimrc
+endif
 
 set nocursorcolumn
