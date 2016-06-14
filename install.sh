@@ -2,12 +2,13 @@
 
 # Install & update all bundled vim plugins asynchronously
 
-cd "$(dirname $0)"
+readonly BASE_DIR="$(dirname "$0")"
+cd "$BASE_DIR"
 
 # First, make sure we have the .vim/tmp & .vim/spell folders
 mkdir -p tmp/ spell/
 
-BUNDLE_PATH="$(dirname $0)/bundle"
+BUNDLE_PATH="$BASE_DIR/bundle"
 
 declare -a pids
 declare -a plugins
@@ -15,7 +16,7 @@ declare -a plugins
 dirList=$(grep '^ *Plugin' vimrc | grep -v "'pinned' *: *1" | sed "s/.*Plugin *'[^/]\+\/\([^']\+\)'.*/\1/")
 # Launch everything asynchronously
 cd "$BUNDLE_PATH"
-for dir in ${dirList[@]}; do
+for dir in "${dirList[@]}"; do
   if [[ -d "${dir}" ]]; then
     plugin="${dir##${BUNDLE_PATH}/}"
     plugin="${plugin%/}"
@@ -31,11 +32,11 @@ done
 
 ret=0
 # Wait for processes to finish
-for k in ${!pids[@]}; do
+for k in "${!pids[@]}"; do
   plugin_path="${plugins[k]}"
   plugin="${plugin_path##${BUNDLE_PATH}/}"
   plugin="${plugin%/}"
-  wait ${pids[k]}
+  wait "${pids[k]}"
   rval=$?
   if [[ $rval -eq 0 ]]; then
     echo "Success: installed ${plugin}"
