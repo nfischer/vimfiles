@@ -13,7 +13,7 @@ hi VertSplit  guifg=darkgrey guibg=NONE ctermfg=darkgrey ctermbg=NONE
 hi DiffDelete ctermfg=black ctermbg=darkgrey
 
 let g:colors_name = 'fischer'
-if &background == 'dark'
+if &background ==# 'dark'
   hi Normal     guifg=white guibg=black   ctermfg=white
 else
   hi Normal     guifg=black guibg=white   ctermfg=black ctermbg=white

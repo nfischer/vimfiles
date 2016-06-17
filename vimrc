@@ -21,6 +21,7 @@ let g:mapleader = ','
 " ===============================================================
 " Settings {{{
 " ===============================================================
+" vint: -ProhibitSetNoCompatible
 set nocompatible            " be iMproved!
 
 set autochdir
@@ -75,7 +76,7 @@ function! DoRemote(arg)
   UpdateRemotePlugins
 endfunction
 
-call plug#begin('~/.vim/plugged')
+call plug#begin(s:VIMFILES . '/plugged')
 if has('python')
   Plug 'Valloric/MatchTagAlways'
   Plug 'google/vim-codefmt'
@@ -83,7 +84,7 @@ if has('python')
   Plug 'google/vim-glaive'
   Plug 'google/vim-maktaba'
 endif
-Plug 'VundleVim/Vundle.vim'
+" Plug 'VundleVim/Vundle.vim'
 Plug 'KabbAmine/gulp-vim'
 " Plug 'altercation/vim-colors-solarized'
 Plug 'alunny/pegjs-vim'
@@ -98,6 +99,7 @@ Plug 'luochen1990/rainbow'
 Plug 'mattn/webapi-vim'
 Plug 'moll/vim-node'
 Plug 'neomake/neomake'
+Plug 'nfischer/vim-marker', { 'frozen': 1 }
 Plug 'nfischer/vim-ohm'
 Plug 'nfischer/vim-potigol'
 Plug 'nfischer/vim-rainbows'
@@ -105,9 +107,8 @@ Plug 'nfischer/vim-vimignore'
 Plug 'pangloss/vim-javascript'
 Plug 'rgrinberg/vim-ocaml'
 Plug 'roryokane/detectindent'
-Plug 'scrooloose/syntastic'
 Plug 'Shougo/deoplete.nvim', { 'do': function('DoRemote') }
-Plug 'ternjs/tern_for_vim'
+" Plug 'ternjs/tern_for_vim'
 Plug 'tmux-plugins/vim-tmux'
 Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-commentary'
@@ -220,16 +221,6 @@ nnoremap <silent> <Down>    :TmuxNavigateDown<cr>
 nnoremap <silent> <Up>      :TmuxNavigateUp<cr>
 nnoremap <silent> <Right>   :TmuxNavigateRight<cr>
 
-" Syntastic settings
-let g:syntastic_mode_map = { 'mode': 'passive' }
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
-let g:syntastic_always_populate_loc_list = 1
-" let g:syntastic_auto_loc_list = 1
-" set statusline+=%#warningmsg#
-" set statusline+=%{SyntasticStatuslineFlag()}
-" set statusline+=%*
-
 " }}}
 
 "==== Indentation and word wrapping ===="
@@ -286,22 +277,22 @@ if has('gui_running')
 
   " Select columns better with gg & G in visual mode
   " Note: set nosol interferes with DRAG_VISUALS in console vim
-  set nosol
+  set nostartofline
   nnoremap <silent> <C-v> :set nosol<CR><C-v>
   vnoremap <silent> <ESC> <ESC>:set sol<CR>
 endif
 
 if s:os ==# 'windows'
-  set dir=%TMP%
+  set directory=%TMP%
 else
-  set dir=~/.vim/tmp,.
+  set directory=~/.vim/tmp,.
 endif
 
 "==== Capslock ===="
 " Execute 'lnoremap x X' and 'lnoremap X x' for each letter a-z.
-for c in range(char2nr('A'), char2nr('Z'))
-  exe 'lnoremap ' . nr2char(c+32) . ' ' . nr2char(c)
-  exe 'lnoremap ' . nr2char(c) . ' ' . nr2char(c+32)
+for s:c in range(char2nr('A'), char2nr('Z'))
+  exe 'lnoremap ' . nr2char(s:c+32) . ' ' . nr2char(s:c)
+  exe 'lnoremap ' . nr2char(s:c) . ' ' . nr2char(s:c+32)
 endfor
 
 augroup InsertEvents
@@ -381,7 +372,7 @@ nnoremap ` '
 
 function! Blink(blinks, blinktime, blinkcmd, unblinkcmd)
   let l:sleep_cmd =  'sleep ' . float2nr(a:blinktime * 1000 / a:blinks) . 'm'
-  for n in range(1, a:blinks)
+  for l:n in range(1, a:blinks)
     exe a:blinkcmd | redraw | exe l:sleep_cmd
     exe a:unblinkcmd | redraw | exe l:sleep_cmd
   endfor
@@ -395,7 +386,7 @@ function! HLNext(blinktime)
   let l:target_pat = '\c\%#'.@/
   let l:blinks = 4
   let l:sleep_cmd =  'sleep ' . float2nr(a:blinktime * 1000/ l:blinks) . 'm'
-  for n in range(1,l:blinks)
+  for l:n in range(1,l:blinks)
     let l:ring = matchadd('WhiteOnRed', l:target_pat, 101)
     redraw | exe l:sleep_cmd
     call matchdelete(l:ring)
@@ -446,7 +437,7 @@ function! HowLong(number_of_times, ...)
   let l:old_more = &more
   set nomore
   let l:start_time = localtime()
-  for i in range(a:number_of_times)
+  for l:i in range(a:number_of_times)
     exe l:command
   endfor
   let l:result = localtime() - l:start_time
@@ -481,18 +472,18 @@ function! DecreaseLineNums(...)
   else
     let l:cmd = "\<C-x>"
   endif
-  for k in range(l:dec_count)
+  for l:k in range(l:dec_count)
     exe 'normal! 0' . l:cmd
   endfor
 endfunction
 
 function! ToggleTest() " for ShellJS/cash
-  if getcwd() =~ 'src/commands'
+  if getcwd() =~# 'src/commands'
     cd ..
     let l:new_dir = 'test'
-  elseif getcwd() =~ 'src'
+  elseif getcwd() =~# 'src'
     let l:new_dir = 'test'
-  elseif getcwd() =~ 'test'
+  elseif getcwd() =~# 'test'
     let l:new_dir = 'src'
     if isdirectory('../src/commands/')
       let l:new_dir = l:new_dir . '/commands'
@@ -566,12 +557,12 @@ endfunction
 
 " a:orig is the original indent, and a:new is the preferred new indent
 function! ChangeIndentFunc(orig, new)
-  let l:old_et = &et
+  let l:old_et = &expandtab
   exe 'set ts=' . a:orig . ' sts=' . a:orig . ' noet'
   retab!
   exe 'set ts=' . a:new . ' sts=' . a:new . ' sw=' . a:new
   if (l:old_et)
-    set et
+    set expandtab
   endif
   retab
 endfunction
@@ -587,6 +578,8 @@ function! MoveSplit(dir)
   endif
 endfunction
 
+" vint: -ProhibitCommandWithUnintendedSideEffect
+" vint: -ProhibitCommandRelyOnUser
 function! FixWhiteSpace()
   let l:old_cursor = getpos('.')
   let l:old_search = getreg('/')
@@ -601,6 +594,8 @@ function! DrawBox()
   s/-/ /eg
   nohl
 endfunction
+" vint: +ProhibitCommandWithUnintendedSideEffect
+" vint: +ProhibitCommandRelyOnUser
 
 function! AddTodo(msg)
   let l:todo_str = 'TODO(' . $USER . '): ' . a:msg
@@ -631,9 +626,9 @@ function! RunProject(...)
     if empty(l:runtarget)
       " Search all open buffers for an executable file
       let l:executables = split(FindExecutables('*'), '\n')
-      for e in l:executables
-        if bufexists(e) || empty(l:runtarget)
-          let l:runtarget = e
+      for l:e in l:executables
+        if bufexists(l:e) || empty(l:runtarget)
+          let l:runtarget = l:e
         endif
       endfor
     endif
@@ -724,15 +719,16 @@ function! DeleteThisFile(...)
   if NumberOfBuffers() == 1 && empty(expand('%'))
     exe 'silent !echo ' . l:msg_string | quit! " In shell
   else
-    echo l:msg_string " In vim if we have more buffers
+    " In vim if we have more buffers
+    echo l:msg_string
   endif
 endfunction
 
 function! NumberOfBuffers()
   let l:highest = bufnr('$')
   let l:bufcount = 0
-  for i in range(1, l:highest+1)
-    if buflisted(i)
+  for l:i in range(1, l:highest+1)
+    if buflisted(l:i)
       let l:bufcount+=1
     endif
   endfor
@@ -759,10 +755,10 @@ function! InsertIFS()
 endfunction
 
 function! OpenFunction(...)
-  for f in a:000
-    echo f
-    " asynchronously open f
-    call system(s:open_cmd . ' ' . f . '&>/dev/null &')
+  for l:f in a:000
+    echo l:f
+    " asynchronously open l:f
+    call system(s:open_cmd . ' ' . l:f . '&>/dev/null &')
   endfor
 endfunction
 
@@ -797,9 +793,9 @@ function! WordCount(...)
   if a:0 == 0
     call WC_file() " No parameter
   else
-    for f in a:000
-      call WC_file(f)
-      echon '   ' . f
+    for l:f in a:000
+      call WC_file(l:f)
+      echon '   ' . l:f
       echo ''
     endfor
   endif
@@ -818,8 +814,6 @@ nnoremap          <leader>sq ciwsquash<Esc>b
 nnoremap          <leader>bu :b<Space>
 nnoremap          <leader>rf :RenameToken <C-r><C-w><space>
 vnoremap          <leader>rf :RenameToken<space>
-nnoremap          <leader>st :SyntasticToggleMode<CR>
-nnoremap          <leader>sc :SyntasticCheck<CR>
 nnoremap          <leader>vg :vimgrep<Space><C-r><C-W><Space>*<CR>
 nnoremap <silent> <leader>qf :<C-u>cwindow<CR>
 nnoremap <silent> <leader>C  :let &scrolloff=999-&scrolloff<CR>
@@ -870,19 +864,19 @@ command! -nargs=0 Gendocs call GenerateDocs()
 command! -complete=shellcmd -nargs=+ Shell call s:RunShellCommand(<q-args>)
 function! s:RunShellCommand(cmdline)
   echo a:cmdline
-  let expanded_cmdline = a:cmdline
-  for part in split(a:cmdline, ' ')
-     if part[0] =~ '\v[%#<]'
-        let expanded_part = fnameescape(expand(part))
-        let expanded_cmdline = substitute(expanded_cmdline, part, expanded_part, '')
+  let l:expanded_cmdline = a:cmdline
+  for l:part in split(a:cmdline, ' ')
+     if l:part[0] =~# '\v[%#<]'
+        let l:expanded_part = fnameescape(expand(l:part))
+        let l:expanded_cmdline = substitute(l:expanded_cmdline, l:part, l:expanded_part, '')
      endif
   endfor
   botright vnew
   setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap
   call setline(1, 'You entered:    ' . a:cmdline)
-  call setline(2, 'Expanded Form:  ' .expanded_cmdline)
+  call setline(2, 'Expanded Form:  ' . l:expanded_cmdline)
   call setline(3,substitute(getline(2),'.','=','g'))
-  execute '$read !'. expanded_cmdline
+  execute '$read !'. l:expanded_cmdline
   setlocal nomodifiable
   1
 endfunction
@@ -964,7 +958,9 @@ augroup END
 
 "==== Make tabs, trailing whitespace, and non-breaking spaces visible, but not in insert mode ===="
 
+" vint: -ProhibitUnnecessaryDoubleQuote
 exe "set listchars=tab:\uB6~,trail:\uB7,nbsp:~"
+" vint: +ProhibitUnnecessaryDoubleQuote
 set list
 
 "==== Make visual blocks a little prettier and more useful ===="
@@ -1001,7 +997,7 @@ nmap  <expr>  <C-RIGHT>  MoveChar('right')
 "==== Skeleton/template files ===="
 augroup Skeleton
   function! s:LoadSkeleton()
-    let l:fname = s:VIMFILES . '/templates/skeleton.' . &ft
+    let l:fname = s:VIMFILES . '/templates/skeleton.' . &filetype
     if filereadable(l:fname)
       silent! exe '0r ' . l:fname | setlocal modified
     endif
