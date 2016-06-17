@@ -8,15 +8,24 @@ cd "$BASE_DIR"
 # First, make sure we have the .vim/tmp & .vim/spell folders
 mkdir -p tmp/ spell/
 
-BUNDLE_PATH="$BASE_DIR/bundle"
+# Install vim-plug
+if [ ! -f 'autoload/plug.vim' ]; then
+  echo 'installing vim-plug'
+  curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+fi
+
+BUNDLE_PATH="$BASE_DIR/plugged"
 
 declare -a pids
 declare -a plugins
 
-dirList=$(grep '^ *Plugin' vimrc | grep -v "'pinned' *: *1" | sed "s/.*Plugin *'[^/]\+\/\([^']\+\)'.*/\1/")
+IFS='
+'
+dirList=$(grep '^ *Plug' vimrc | grep -v "'pinned' *: *1" | sed "s/.*Plug\(in\)\? *'[^/]\+\/\([^']\+\)'.*/\2/")
 # Launch everything asynchronously
 cd "$BUNDLE_PATH"
-for dir in "${dirList[@]}"; do
+for dir in ${dirList[@]}; do
   if [[ -d "${dir}" ]]; then
     plugin="${dir##${BUNDLE_PATH}/}"
     plugin="${plugin%/}"

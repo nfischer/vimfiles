@@ -1,9 +1,9 @@
 " vim: set foldmethod=marker foldlevel=0:
 " Vimrc and gVimrc file
 
-" =============================================================================
+" ===============================================================
 " System Information {{{
-" =============================================================================
+" ===============================================================
 if has('win32') || has('win16')
   let s:os = 'windows'
   let s:VIMFILES = $HOME . '/vimfiles'
@@ -18,9 +18,9 @@ endif
 
 let g:mapleader = ','
 
-" =============================================================================
+" ===============================================================
 " Settings {{{
-" =============================================================================
+" ===============================================================
 set nocompatible            " be iMproved!
 
 set autochdir
@@ -66,72 +66,77 @@ nohl                        " Default = don't highlight
 " Highlight VCS conflict markers
 match ErrorMsg '^\(<\|=\|>\)\{7\}\([^=].\+\)\?$'
 
-" =============================================================================
-" Vundle {{{
-" =============================================================================
-filetype off
-" if s:os ==# 'windows'
-"   set rtp+=~/vimfiles/bundle/Vundle.vim/
-" else
-"   set rtp+=~/.vim/bundle/Vundle.vim/
-" endif
-exe 'set rtp+=' . s:VIMFILES . '/bundle/Vundle.vim/'
+" ===============================================================
+" vim-plug {{{
+" ===============================================================
 
-call vundle#begin()
+" setup functions
+function! DoRemote(arg)
+  UpdateRemotePlugins
+endfunction
+
+call plug#begin('~/.vim/plugged')
 if has('python')
-  Plugin 'Valloric/MatchTagAlways'
-  Plugin 'google/vim-codefmt'
-  Plugin 'google/vim-codereview'
-  Plugin 'google/vim-glaive'
-  Plugin 'google/vim-maktaba'
+  Plug 'Valloric/MatchTagAlways'
+  Plug 'google/vim-codefmt'
+  Plug 'google/vim-codereview'
+  Plug 'google/vim-glaive'
+  Plug 'google/vim-maktaba'
 endif
-Plugin 'VundleVim/Vundle.vim'
-Plugin 'KabbAmine/gulp-vim'
-" Plugin 'altercation/vim-colors-solarized'
-Plugin 'alunny/pegjs-vim'
-Plugin 'alvan/vim-closetag'
-Plugin 'chrisbra/unicode.vim'
-Plugin 'chrisbra/vim-diff-enhanced'
-Plugin 'christoomey/vim-tmux-navigator'
-Plugin 'heavenshell/vim-pydocstring'
-Plugin 'junegunn/vim-emoji'
-" Plugin 'klen/python-mode'
-Plugin 'luochen1990/rainbow'
-Plugin 'mattn/webapi-vim'
-Plugin 'moll/vim-node'
-Plugin 'nfischer/vim-marker', {'pinned': 1}
-Plugin 'nfischer/vim-ohm'
-Plugin 'nfischer/vim-potigol', {'pinned': 1}
-Plugin 'nfischer/vim-rainbows', {'pinned': 1}
-Plugin 'nfischer/vim-vimignore'
-Plugin 'pangloss/vim-javascript'
-Plugin 'rgrinberg/vim-ocaml'
-Plugin 'roryokane/detectindent'
-Plugin 'scrooloose/syntastic'
-Plugin 'ternjs/tern_for_vim'
-Plugin 'tmux-plugins/vim-tmux'
-Plugin 'tpope/vim-abolish'
-Plugin 'tpope/vim-commentary'
-Plugin 'tpope/vim-dispatch'
-Plugin 'tpope/vim-fugitive' | let s:fugitive_loaded = 1
-Plugin 'tpope/vim-repeat'
-Plugin 'tpope/vim-surround'
-" Plugin 'w0ng/vim-hybrid'
-Plugin 'vim-airline/vim-airline'
-Plugin 'wlangstroth/vim-racket'
-" Plugin 'airblade/vim-gitgutter'
-" Plugin 'ap/vim-buftabline'
-" Plugin 'bpowell/vim-android'
-" Plugin 'hsanson/vim-android'
-" Plugin 'syngan/vim-vimlint'
-call vundle#end()
+Plug 'VundleVim/Vundle.vim'
+Plug 'KabbAmine/gulp-vim'
+" Plug 'altercation/vim-colors-solarized'
+Plug 'alunny/pegjs-vim'
+Plug 'alvan/vim-closetag'
+Plug 'chrisbra/unicode.vim'
+Plug 'chrisbra/vim-diff-enhanced'
+Plug 'christoomey/vim-tmux-navigator'
+Plug 'heavenshell/vim-pydocstring'
+Plug 'junegunn/vim-emoji'
+" Plug 'klen/python-mode'
+Plug 'luochen1990/rainbow'
+Plug 'mattn/webapi-vim'
+Plug 'moll/vim-node'
+Plug 'neomake/neomake'
+Plug 'nfischer/vim-ohm'
+Plug 'nfischer/vim-potigol'
+Plug 'nfischer/vim-rainbows'
+Plug 'nfischer/vim-vimignore'
+Plug 'pangloss/vim-javascript'
+Plug 'rgrinberg/vim-ocaml'
+Plug 'roryokane/detectindent'
+Plug 'scrooloose/syntastic'
+Plug 'Shougo/deoplete.nvim', { 'do': function('DoRemote') }
+Plug 'ternjs/tern_for_vim'
+Plug 'tmux-plugins/vim-tmux'
+Plug 'tpope/vim-abolish'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-dispatch'
+Plug 'tpope/vim-fugitive' | let s:fugitive_loaded = 1
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-surround'
+" Plug 'w0ng/vim-hybrid'
+Plug 'vim-airline/vim-airline'
+Plug 'wlangstroth/vim-racket'
+" Plug 'airblade/vim-gitgutter'
+" Plug 'ap/vim-buftabline'
+" Plug 'bpowell/vim-android'
+" Plug 'hsanson/vim-android'
+" Plug 'syngan/vim-vimlint'
+call plug#end()
 " }}}
-" =============================================================================
+" ===============================================================
 " Plugin settings {{{
-" =============================================================================
+" ===============================================================
 
 " let g:solarized_termcolors=256
 " colorscheme hybrid
+let g:deoplete#enable_at_startup = 1
+
+augroup NeoMake
+  au!
+  au BufEnter,BufWritePost * Neomake
+augroup END
 
 " Rainbows-lang ftplugin
 let g:rainbows#inferencer_path = '/home/nate/programming/rainbows/bin/rain-infer.js'
@@ -206,9 +211,8 @@ if exists('s:fugitive_loaded')
 endif
 
 " Vundle mappings
-nnoremap <silent> <leader>vu :<C-u>PluginInstall!<CR>
-nnoremap <silent> <leader>vi :<C-u>PluginInstall<CR>
-nnoremap <silent> <leader>vl :<C-u>PluginList<CR>
+nnoremap <silent> <leader>vu :<C-u>PlugUpdate<CR>
+nnoremap <silent> <leader>vi :<C-u>PlugInstall<CR>
 
 " Tmux mappings
 nnoremap <silent> <Left>    :TmuxNavigateLeft<cr>
@@ -450,9 +454,9 @@ function! HowLong(number_of_times, ...)
   return l:result
 endfunction
 
-" =============================================================================
+" ===============================================================
 " Leader functions {{{
-" =============================================================================
+" ===============================================================
 
 function! AlphaArgs(num)
   let l:alpha_args = join(split('abcdefghijklmnopqrstuvwxyz', '\zs')[0:a:num-1], ', ')
@@ -802,9 +806,9 @@ function! WordCount(...)
 endfunction
 
 " }}}
-" =============================================================================
+" ===============================================================
 " Leader mappings {{{
-" =============================================================================
+" ===============================================================
 
 nnoremap <silent> <leader>tt :call ToggleTest()<CR>
 nnoremap <silent> <leader>gl :Gulp<CR>
@@ -854,9 +858,9 @@ nnoremap <silent> <leader>3  :Header 3<CR>
 nnoremap <silent> <leader>4  :Header 4<CR>
 
 " }}}
-" =============================================================================
+" ===============================================================
 " Custom Commands {{{
-" =============================================================================
+" ===============================================================
 
 command! -nargs=1 Alpha call AlphaArgs(<f-args>)
 command! -complete=file -nargs=1 Browser !chromium-browser <args> &>/dev/null &
@@ -990,9 +994,9 @@ nmap         ++  vip++
 nmap  <expr>  <C-LEFT>   MoveChar('left')
 nmap  <expr>  <C-RIGHT>  MoveChar('right')
 
-" =============================================================================
+" ===============================================================
 " Autocommands {{{
-" =============================================================================
+" ===============================================================
 
 "==== Skeleton/template files ===="
 augroup Skeleton

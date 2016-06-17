@@ -6,6 +6,8 @@
 .DS_Store
 
 bundle/
+plugged/
+autoload/plug.vim
 spell/
 .netrwhist
 plugin/instantlyBetterVim12/
