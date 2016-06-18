@@ -8,43 +8,57 @@ cd "$BASE_DIR"
 # First, make sure we have the .vim/tmp & .vim/spell folders
 mkdir -p tmp/ spell/
 
+# Link this directory to the neovim directory
+NVIM_DIR="$HOME/.config/nvim"
+mkdir -p "$(dirname "$NVIM_DIR")"
+test -L "$NVIM_DIR" || ln -s "$PWD" "$NVIM_DIR"
+echo "ln -s $NVIM_DIR $PWD"
+
 # Install vim-plug
 if [ ! -f 'autoload/plug.vim' ]; then
   echo 'installing vim-plug'
-  curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim ||
+    { echo 'curl failed'; exit 1; }
 fi
 
 BUNDLE_PATH="$BASE_DIR/plugged"
 
 declare -a pids
 declare -a plugins
+declare -a dirList
 
 IFS='
 '
-dirList=$(grep '^ *Plug' vimrc | grep -v "'pinned' *: *1" | sed "s/.*Plug\(in\)\? *'[^/]\+\/\([^']\+\)'.*/\2/")
+readarray -t dirList <<<"$(grep '^ *Plug' vimrc |
+  egrep -v "'(pinned|frozen)' *: *1" |
+  sed "s/.*Plug\(in\)\? *'\([^/]\+\/[^']\+\)'.*/\2/")"
+echo "Updating/installing ${#dirList[@]} plugins"
+
 # Launch everything asynchronously
+mkdir -p "$BUNDLE_PATH"
 cd "$BUNDLE_PATH"
-for dir in ${dirList[@]}; do
-  if [[ -d "${dir}" ]]; then
-    plugin="${dir##${BUNDLE_PATH}/}"
-    plugin="${plugin%/}"
+for plugin in "${dirList[@]}"; do
+  dir="${plugin#*/}"
+  if [[ ! -e "${dir}" ]]; then
+    (
+      git clone --recursive "https://github.com/${plugin}.git"
+    ) &>/dev/null &
+    pids+=($!)
+  elif [[ -d "${dir}" ]]; then
     # echo "Downloading ${plugin}"
     (
       git -C "${dir}" pull &&
       git -C "${dir}" submodule update --init --recursive
     ) &>/dev/null &
     pids+=($!)
-    plugins+=(${dir})
   fi
+  plugins+=(${plugin})
 done
 
 ret=0
 # Wait for processes to finish
 for k in "${!pids[@]}"; do
-  plugin_path="${plugins[k]}"
-  plugin="${plugin_path##${BUNDLE_PATH}/}"
-  plugin="${plugin%/}"
+  plugin="${plugins[k]}"
   wait "${pids[k]}"
   rval=$?
   if [[ $rval -eq 0 ]]; then
