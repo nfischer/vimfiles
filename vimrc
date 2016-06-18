@@ -79,14 +79,16 @@ endfunction
 call plug#begin(s:VIMFILES . '/plugged')
 if has('python')
   Plug 'Valloric/MatchTagAlways'
-  Plug 'google/vim-codefmt'
+  Plug 'google/vim-codefmt', { 'on': ['FormatCode', 'FormatLines'] }
   Plug 'google/vim-codereview'
   Plug 'google/vim-glaive'
   Plug 'google/vim-maktaba'
 endif
-" Plug 'VundleVim/Vundle.vim'
+if has('nvim') " Requires neovim
+  Plug 'Shougo/deoplete.nvim', { 'do': function('DoRemote') }
+  Plug 'neomake/neomake'
+endif
 Plug 'KabbAmine/gulp-vim'
-" Plug 'altercation/vim-colors-solarized'
 Plug 'alunny/pegjs-vim'
 Plug 'alvan/vim-closetag'
 Plug 'chrisbra/unicode.vim'
@@ -94,11 +96,9 @@ Plug 'chrisbra/vim-diff-enhanced'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'heavenshell/vim-pydocstring'
 Plug 'junegunn/vim-emoji'
-" Plug 'klen/python-mode'
 Plug 'luochen1990/rainbow'
 Plug 'mattn/webapi-vim'
 Plug 'moll/vim-node'
-Plug 'neomake/neomake'
 Plug 'nfischer/vim-marker', { 'frozen': 1 }
 Plug 'nfischer/vim-ohm'
 Plug 'nfischer/vim-potigol'
@@ -107,8 +107,6 @@ Plug 'nfischer/vim-vimignore'
 Plug 'pangloss/vim-javascript'
 Plug 'rgrinberg/vim-ocaml'
 Plug 'roryokane/detectindent'
-Plug 'Shougo/deoplete.nvim', { 'do': function('DoRemote') }
-" Plug 'ternjs/tern_for_vim'
 Plug 'tmux-plugins/vim-tmux'
 Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-commentary'
@@ -116,15 +114,20 @@ Plug 'tpope/vim-dispatch'
 Plug 'tpope/vim-fugitive' | let s:fugitive_loaded = 1
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
-" Plug 'w0ng/vim-hybrid'
 Plug 'vim-airline/vim-airline'
 Plug 'wlangstroth/vim-racket'
+" Plug 'VundleVim/Vundle.vim'
 " Plug 'airblade/vim-gitgutter'
+" Plug 'altercation/vim-colors-solarized'
 " Plug 'ap/vim-buftabline'
 " Plug 'bpowell/vim-android'
 " Plug 'hsanson/vim-android'
+" Plug 'klen/python-mode'
 " Plug 'syngan/vim-vimlint'
+" Plug 'ternjs/tern_for_vim'
+" Plug 'w0ng/vim-hybrid'
 call plug#end()
+
 " }}}
 " ===============================================================
 " Plugin settings {{{
@@ -132,12 +135,14 @@ call plug#end()
 
 " let g:solarized_termcolors=256
 " colorscheme hybrid
-let g:deoplete#enable_at_startup = 1
+if has('nvim')
+  let g:deoplete#enable_at_startup = 1
 
-augroup NeoMake
-  au!
-  au BufEnter,BufWritePost * Neomake
-augroup END
+  augroup Neomake
+    au!
+    au BufEnter,BufWritePost * Neomake
+  augroup END
+endif
 
 " Rainbows-lang ftplugin
 let g:rainbows#inferencer_path = '/home/nate/programming/rainbows/bin/rain-infer.js'
