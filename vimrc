@@ -57,6 +57,7 @@ set ttimeoutlen=200         " Exit insert mode quickly
 set undolevels=1000
 set virtualedit=block       " makes virtual blocks cleaner and blockier
 set wildignore+=.DS_Store,*.swp,*.bak,*.pyc,*.class,*.o,*.obj
+set winaltkeys=no           " Don't let Windows eat the alt-key
 
 " }}}
 
@@ -183,17 +184,6 @@ let &diffexpr='EnhancedDiff#Diff("git diff", "--diff-algorithm=patience")'
 runtime ftplugin/man.vim
 filetype plugin on
 
-augroup FileTypeOptions
-  " Configure comment patterns and other things
-  autocmd!
-  autocmd FileType c,cpp,cs,java,markdown   setlocal commentstring=//\ %s
-  autocmd FileType bash,python              setlocal commentstring=#\ %s
-  autocmd FileType vim                      setlocal commentstring=\"\ %s
-  autocmd FileType gitcommit,markdown       setlocal spell
-  autocmd FileType scheme                   setlocal lisp
-augroup END
-
-
 " DetectIndent settings
 augroup DetectIndent
   autocmd!
@@ -227,32 +217,15 @@ nnoremap <silent> <Up>      :TmuxNavigateUp<cr>
 nnoremap <silent> <Right>   :TmuxNavigateRight<cr>
 
 " }}}
-
-"==== Indentation and word wrapping ===="
+" ===============================================================
+" Indentation and word wrapping {{{
+" ===============================================================
 if !exists('s:has_set_indent')
   set shiftwidth=2 tabstop=2 softtabstop=2
   set expandtab
   set smarttab
   let s:has_set_indent = 1
 endif
-
-" Format options to wordwrap properly, but not auto-comment
-"set lbr
-if v:version < 704
-  set formatoptions=qnl      " Add the options I want
-else
-  set formatoptions=qnlj
-endif
-" Autocommenting is removed by a plugin
-
-" Configure the mouse (scrolling only)
-set mouse=a
-noremap  <LeftMouse>   <nop>
-noremap  <LeftRelease> <nop>
-noremap  <RightMouse>  <nop>
-inoremap <LeftMouse>   <nop>
-inoremap <LeftRelease> <nop>
-inoremap <RightMouse>  <nop>
 
 " Fix smartindent stupidities
 " And no magic outdent for comments
@@ -268,12 +241,25 @@ endfunction
 vnoremap < <gv
 vnoremap > >gv
 
-" Set up markdown highlighting
-augroup Markdown
-  autocmd!
-  autocmd BufNewfile,BufReadPost *.md set filetype=markdown
-  autocmd BufNewfile,BufReadPost *.pl set filetype=prolog
-augroup END
+" Format options to wordwrap properly, but not auto-comment
+"set lbr
+if v:version < 704
+  set formatoptions=qnl      " Add the options I want
+else
+  set formatoptions=qnlj
+endif
+" Autocommenting is removed by a plugin
+
+" }}}
+
+" Configure the mouse (scrolling only)
+set mouse=a
+noremap  <LeftMouse>   <nop>
+noremap  <LeftRelease> <nop>
+noremap  <RightMouse>  <nop>
+inoremap <LeftMouse>   <nop>
+inoremap <LeftRelease> <nop>
+inoremap <RightMouse>  <nop>
 
 if has('gui_running')
   " GUI specific
@@ -299,17 +285,6 @@ for s:c in range(char2nr('A'), char2nr('Z'))
   exe 'lnoremap ' . nr2char(s:c+32) . ' ' . nr2char(s:c)
   exe 'lnoremap ' . nr2char(s:c) . ' ' . nr2char(s:c+32)
 endfor
-
-augroup InsertEvents
-  autocmd!
-  autocmd InsertLeave * set iminsert=0
-  autocmd InsertEnter * set nolist
-  autocmd InsertLeave * set list
-augroup END
-
-"==== Alt key ===="
-
-set winaltkeys=no
 
 "==== Key mappings ===="
 
@@ -358,7 +333,9 @@ nnoremap <silent> <leader>sp :setlocal spell!\|set spell?<CR>
 vnoremap <silent> <leader>sp :<C-u>setlocal spell!<CR>gv
 inoremap <C-l> <Esc>[s1z=`]a
 
-"==== Instantly Better Vim additions ===="
+" ===============================================================
+" Instantly Better Vim additions {{{
+" ===============================================================
 
 "====[ Make the 81st column stand out ]===="
 
@@ -417,6 +394,7 @@ function! HLGoto(blinktime)
   let &cursorline=s:oldcursorline
 endfunction
 
+" Move a single char left or right
 function! MoveChar(dir)
   let l:at_last_col = col('.') == col('$')-1
   let l:is_left = a:dir ==# 'left'
@@ -430,6 +408,26 @@ function! MoveChar(dir)
     return 'xp' " move right
   endif
 endfunction
+nmap  <expr>  <C-LEFT>   MoveChar('left')
+nmap  <expr>  <C-RIGHT>  MoveChar('right')
+
+"==== Use a plugin from Instantly Better Vim to drag visual blocks ===="
+vmap  <expr>  <LEFT>   DVB_Drag('left')
+vmap  <expr>  <RIGHT>  DVB_Drag('right')
+vmap  <expr>  <DOWN>   DVB_Drag('down')
+vmap  <expr>  <UP>     DVB_Drag('up')
+vmap  <expr>  D        DVB_Duplicate()
+let g:DVB_TrimWS = 1
+
+"==== Changes list from comma separated to bulleted and back ===="
+nmap  <leader>lt  :call ListTrans_toggle_format()<CR>
+vmap  <leader>lt  :call ListTrans_toggle_format('visual')<CR>
+
+"==== Do some math on columns. Instantly better vim ===="
+vmap <expr>  ++  VMATH_YankAndAnalyse()
+nmap         ++  vip++
+
+" }}}
 
 " Times the number of times a particular command takes to execute the specified
 " number of times (in seconds).
@@ -883,9 +881,7 @@ function! s:RunShellCommand(cmdline)
   call setline(3,substitute(getline(2),'.','=','g'))
   execute '$read !'. l:expanded_cmdline
   setlocal nomodifiable
-  1
 endfunction
-
 
 com! -nargs=0                         LongLines call setreg('/', '\m^.\{81,}$')|
     \ echo 'press n to go to the next long line'
@@ -912,20 +908,10 @@ com! -nargs=+ -complete=file          Open call OpenFunction(<f-args>)
 
 " Unixy things
 com! -nargs=+ -complete=file          Rm call DeleteThisFile(<f-args>)
-com! -nargs=* -complete=file          Ls echo system('ls --color=auto ' . <f-args>)
+com! -nargs=* -complete=file          Ls echo system('ls --color=auto ' . <q-args>)
 com! -nargs=* -complete=file          Wc call WordCount(<f-args>)
 
 " }}}
-
-"====[ Open any file with a pre-existing swapfile in readonly mode ]===="
-augroup NoSimultaneousEdits
-  autocmd!
-  autocmd SwapExists * let v:swapchoice = 'o'
-  autocmd SwapExists * echohl ErrorMsg
-  autocmd SwapExists * echomsg 'Duplicate edit session (readonly)'
-  autocmd SwapExists * echohl NONE
-  autocmd SwapExists * sleep 1
-augroup END
 
 " Restore cursor position to where it was before
 function! s:JumpToLastPosition(fname)
@@ -968,32 +954,9 @@ exe "set listchars=tab:\uB6~,trail:\uB7,nbsp:~"
 " vint: +ProhibitUnnecessaryDoubleQuote
 set list
 
-"==== Make visual blocks a little prettier and more useful ===="
-
 "==== Vim Window setup ===="
-
 nnoremap <silent> <C-w>h :call MoveSplit('left')<CR>
 nnoremap <silent> <C-w>l :call MoveSplit('right')<CR>
-
-"==== Use a plugin from Instantly Better Vim to drag visual blocks ===="
-vmap  <expr>  <LEFT>   DVB_Drag('left')
-vmap  <expr>  <RIGHT>  DVB_Drag('right')
-vmap  <expr>  <DOWN>   DVB_Drag('down')
-vmap  <expr>  <UP>     DVB_Drag('up')
-vmap  <expr>  D        DVB_Duplicate()
-let g:DVB_TrimWS = 1
-
-"==== Changes list from comma separated to bulleted and back ===="
-nmap  <leader>lt  :call ListTrans_toggle_format()<CR>
-vmap  <leader>lt  :call ListTrans_toggle_format('visual')<CR>
-
-"==== Do some math on columns. Instantly better vim ===="
-vmap <expr>  ++  VMATH_YankAndAnalyse()
-nmap         ++  vip++
-
-" Move a single char left or right
-nmap  <expr>  <C-LEFT>   MoveChar('left')
-nmap  <expr>  <C-RIGHT>  MoveChar('right')
 
 " ===============================================================
 " Autocommands {{{
@@ -1021,6 +984,35 @@ augroup END
 augroup ErrorBells
   autocmd!
   autocmd GUIEnter * set vb t_vb=
+augroup END
+
+"====[ Open any file with a pre-existing swapfile in readonly mode ]===="
+augroup NoSimultaneousEdits
+  autocmd!
+  autocmd SwapExists * let v:swapchoice = 'o'
+  autocmd SwapExists * echohl ErrorMsg
+  autocmd SwapExists * echomsg 'Duplicate edit session (readonly)'
+  autocmd SwapExists * echohl NONE
+  autocmd SwapExists * sleep 1
+augroup END
+
+augroup FileTypeOptions
+  " Configure comment patterns and other things
+  autocmd!
+  autocmd FileType c,cpp,cs,java,markdown   setlocal commentstring=//\ %s
+  autocmd FileType bash,python              setlocal commentstring=#\ %s
+  autocmd FileType vim                      setlocal commentstring=\"\ %s
+  autocmd FileType gitcommit,markdown       setlocal spell
+  autocmd FileType scheme                   setlocal lisp
+  autocmd BufNewfile,BufReadPost *.md set filetype=markdown
+  autocmd BufNewfile,BufReadPost *.pl set filetype=prolog
+augroup END
+
+augroup InsertEvents
+  autocmd!
+  autocmd InsertLeave * set iminsert=0
+  autocmd InsertEnter * set nolist
+  autocmd InsertLeave * set list
 augroup END
 
 " }}}
