@@ -138,6 +138,7 @@ call plug#end()
 if has('nvim')
   let g:deoplete#enable_at_startup = 1
 
+  let g:neomake_javascript_enabled_makers = ['eslint']
   augroup Neomake
     au!
     au BufEnter,BufWritePost * Neomake
@@ -554,8 +555,11 @@ function! RenameTokenFunction(orig, new) range
 
   " Do a global replace
   let l:old_search = getreg('/')
+  let l:old_gdefault = &gdefault
+  set nogdefault
   silent exe a:firstline . ',' . a:lastline . 's/\C\<' . a:orig . '\>/' . a:new
       \ . '/g'
+  let &gdefault = l:old_gdefault
   echo a:orig . ' -> ' . a:new
   call setreg('/', l:old_search)
 endfunction
