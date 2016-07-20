@@ -8,6 +8,7 @@
 bundle/
 plugged/
 autoload/plug.vim
+autoload/plug.vim.old
 spell/
 .netrwhist
 plugin/instantlyBetterVim12/

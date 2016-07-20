@@ -72,11 +72,6 @@ match ErrorMsg '^\(<\|=\|>\)\{7\}\([^=].\+\)\?$'
 " vim-plug {{{
 " ===============================================================
 
-" setup functions
-function! DoRemote(arg)
-  UpdateRemotePlugins
-endfunction
-
 call plug#begin(s:VIMFILES . '/plugged')
 if has('python')
   Plug 'Valloric/MatchTagAlways'
@@ -86,7 +81,7 @@ if has('python')
   Plug 'google/vim-maktaba'
 endif
 if has('nvim') " Requires neovim
-  Plug 'Shougo/deoplete.nvim', { 'do': function('DoRemote') }
+  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
   Plug 'neomake/neomake'
 endif
 Plug 'KabbAmine/gulp-vim'
