@@ -17,7 +17,6 @@ endif
 " }}}
 
 let g:mapleader = ','
-
 " ===============================================================
 " Settings {{{
 " ===============================================================
@@ -55,6 +54,7 @@ set textwidth=80
 set timeoutlen=1000         " But still give me time to enter leader commands
 set ttimeoutlen=200         " Exit insert mode quickly
 set undolevels=1000
+set undofile                " Preserve undo history between sessions
 set virtualedit=block       " makes virtual blocks cleaner and blockier
 set wildignore+=.DS_Store,*.swp,*.bak,*.pyc,*.class,*.o,*.obj
 set winaltkeys=no           " Don't let Windows eat the alt-key
@@ -90,6 +90,7 @@ Plug 'alvan/vim-closetag'
 Plug 'chrisbra/unicode.vim'
 Plug 'chrisbra/vim-diff-enhanced'
 Plug 'christoomey/vim-tmux-navigator'
+Plug 'fatih/vim-go'
 Plug 'heavenshell/vim-pydocstring'
 Plug 'junegunn/vim-emoji'
 Plug 'luochen1990/rainbow'
@@ -103,6 +104,7 @@ Plug 'nfischer/vim-vimignore'
 Plug 'pangloss/vim-javascript'
 Plug 'rgrinberg/vim-ocaml'
 Plug 'roryokane/detectindent'
+Plug 'suy/vim-context-commentstring'
 Plug 'tmux-plugins/vim-tmux'
 Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-commentary'
@@ -112,7 +114,6 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'vim-airline/vim-airline'
 Plug 'wlangstroth/vim-racket'
-" Plug 'VundleVim/Vundle.vim'
 " Plug 'airblade/vim-gitgutter'
 " Plug 'altercation/vim-colors-solarized'
 " Plug 'ap/vim-buftabline'
@@ -120,7 +121,7 @@ Plug 'wlangstroth/vim-racket'
 " Plug 'hsanson/vim-android'
 " Plug 'klen/python-mode'
 " Plug 'syngan/vim-vimlint'
-" Plug 'ternjs/tern_for_vim'
+" Plug 'ternjs/tern_for_vim', { 'do': 'npm install' }
 " Plug 'w0ng/vim-hybrid'
 call plug#end()
 
@@ -174,7 +175,9 @@ let g:pydocstring_enable_mapping = 0
 set laststatus=2
 
 " PatienceDiff settings
-let &diffexpr='EnhancedDiff#Diff("git diff", "--diff-algorithm=patience")'
+if v:version >= 704
+  let &diffexpr='EnhancedDiff#Diff("git diff", "--diff-algorithm=patience")'
+endif
 
 " Built-in plugins
 runtime ftplugin/man.vim
@@ -269,12 +272,19 @@ if has('gui_running')
   vnoremap <silent> <ESC> <ESC>:set sol<CR>
 endif
 
-if s:os ==# 'windows'
-  set directory=%TMP%
-else
-  set directory=~/.vim/tmp,.
+" ===============================================================
+" 'directory' and 'undodir' {{{
+" ===============================================================
+let s:prefix = s:os ==# 'windows' ? '%TMP%\' : '~/.vim/'
+exe 'set directory=' . s:prefix . 'tmp,.'
+exe 'set directory=' . s:prefix . 'undodir,.'
+if !isdirectory(expand(s:prefix . 'tmp'))
+  call mkdir(expand(s:prefix . 'tmp'), 'p')
 endif
-
+if !isdirectory(expand(s:prefix . 'undodir'))
+  call mkdir(expand(s:prefix . 'undodir'), 'p')
+endif
+" }}}
 "==== Capslock ===="
 " Execute 'lnoremap x X' and 'lnoremap X x' for each letter a-z.
 for s:c in range(char2nr('A'), char2nr('Z'))
@@ -282,8 +292,9 @@ for s:c in range(char2nr('A'), char2nr('Z'))
   exe 'lnoremap ' . nr2char(s:c) . ' ' . nr2char(s:c+32)
 endfor
 
-"==== Key mappings ===="
-
+" ===============================================================
+" Key mappings {{{
+" ===============================================================
 " Swap : and ;
 noremap  ;  :
 noremap  <Bslash>  ;
@@ -328,7 +339,7 @@ endif
 nnoremap <silent> <leader>sp :setlocal spell!\|set spell?<CR>
 vnoremap <silent> <leader>sp :<C-u>setlocal spell!<CR>gv
 inoremap <C-l> <Esc>[s1z=`]a
-
+" }}}
 " ===============================================================
 " Instantly Better Vim additions {{{
 " ===============================================================
@@ -424,6 +435,9 @@ vmap <expr>  ++  VMATH_YankAndAnalyse()
 nmap         ++  vip++
 
 " }}}
+" ===============================================================
+" Leader functions {{{
+" ===============================================================
 
 " Times the number of times a particular command takes to execute the specified
 " number of times (in seconds).
@@ -443,10 +457,6 @@ function! HowLong(number_of_times, ...)
   let &more = l:old_more
   return l:result
 endfunction
-
-" ===============================================================
-" Leader functions {{{
-" ===============================================================
 
 function! AlphaArgs(num)
   let l:alpha_args = join(split('abcdefghijklmnopqrstuvwxyz', '\zs')[0:a:num-1], ', ')
@@ -911,7 +921,9 @@ com! -nargs=* -complete=file          Ls echo system('ls --color=auto ' . <q-arg
 com! -nargs=* -complete=file          Wc call WordCount(<f-args>)
 
 " }}}
-
+" ===============================================================
+" JumpCursorOnEdit {{{
+" ===============================================================
 " Restore cursor position to where it was before
 function! s:JumpToLastPosition(fname)
   if expand(a:fname . ':p:h') !=? $TEMP
@@ -945,6 +957,7 @@ augroup JumpCursorOnEdit
   autocmd BufReadPost,BufWinEnter * call s:JumpToLastPosition('<afile>')
   autocmd BufWinEnter * call s:OpenFolds()
 augroup END
+" }}}
 
 "==== Make tabs, trailing whitespace, and non-breaking spaces visible, but not in insert mode ===="
 

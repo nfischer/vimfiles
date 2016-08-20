@@ -5,8 +5,8 @@
 readonly BASE_DIR="$(dirname "$0")"
 cd "$BASE_DIR"
 
-# First, make sure we have the .vim/tmp & .vim/spell folders
-mkdir -p tmp/ spell/
+# First, make sure we have the .vim subdirectories
+mkdir -p tmp/ spell/ undodir/
 
 # Link this directory to the neovim directory
 NVIM_DIR="$HOME/.config/nvim"
