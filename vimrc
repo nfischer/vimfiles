@@ -110,7 +110,7 @@ Plug 'mattn/webapi-vim'
 Plug 'mileszs/ack.vim'
 Plug 'miyakogi/conoline.vim'
 Plug 'moll/vim-node'
-Plug 'neomake/neomake'
+Plug 'neomake/neomake' | let s:neomake_loaded = 1
 Plug 'nfischer/vim-ohm'
 Plug 'nfischer/vim-potigol'
 Plug 'nfischer/vim-rainbows'
@@ -122,7 +122,7 @@ Plug 'rhysd/nyaovim-popup-tooltip'
 Plug 'rhysd/nyaovim-running-gopher'
 Plug 'rhysd/vim-crystal'
 Plug 'rhysd/vim-gfm-syntax'
-Plug 'roryokane/detectindent'
+Plug 'roryokane/detectindent' | let s:detect_indent_loaded = 1
 Plug 'snaewe/Instantly_Better_Vim_2013'
 Plug 'suy/vim-context-commentstring'
 Plug 'tmux-plugins/vim-tmux'
@@ -136,8 +136,8 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-vinegar'
-Plug 'tyrannicaltoucan/vim-quantum'
-Plug 'vim-airline/vim-airline'
+Plug 'tyrannicaltoucan/vim-quantum' | let s:quantum_loaded = 1
+Plug 'vim-airline/vim-airline' | let s:airline_loaded = 1
 Plug 'wellle/tmux-complete.vim'
 Plug 'whatyouhide/vim-lengthmatters'
 
@@ -170,9 +170,11 @@ if has('termguicolors')
   set termguicolors
 endif
 
-let g:airline_theme = 'quantum'
-let g:quantum_black = 1
-colorscheme quantum
+if exists('s:quantum_loaded')
+  let g:airline_theme = 'quantum'
+  let g:quantum_black = 1
+  colorscheme quantum
+endif
 syntax on
 
 let g:conoline_use_colorscheme_default_normal = 1
@@ -195,10 +197,12 @@ let g:neocomplete#enable_at_startup = 1
 if has('nvim') || has('job')
 
   let g:neomake_javascript_enabled_makers = ['eslint']
-  augroup Neomake
-    au!
-    au BufEnter,BufWritePost * Neomake
-  augroup END
+  if exists('s:neomake_loaded')
+    augroup Neomake
+      au!
+      au BufEnter,BufWritePost * Neomake
+    augroup END
+  endif
 endif
 
 " Rainbow parens
@@ -235,10 +239,12 @@ if v:version >= 704
 endif
 
 " DetectIndent settings
-augroup DetectIndent
-  autocmd!
-  autocmd BufReadPost * DetectIndent
-augroup END
+if exists('s:detect_indent_loaded')
+  augroup DetectIndent
+    autocmd!
+    autocmd BufReadPost * DetectIndent
+  augroup END
+endif
 
 " Fugitive settings
 if exists('s:fugitive_loaded')
@@ -740,6 +746,9 @@ augroup END
 augroup ConfigReload
   autocmd!
   autocmd BufWritePost $MYVIMRC source $MYVIMRC
+  if exists('s:airline_loaded')
+    autocmd BufWritePost $MYVIMRC AirlineRefresh
+  endif
 augroup END
 
 "==== No damn blinking lights! ===="
