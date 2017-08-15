@@ -11,7 +11,7 @@ if has('win32') || has('win16')
   let s:os = 'windows'
   let s:VIMFILES = $HOME . '/vimfiles'
 elseif has('unix')
-  let s:os = substitute(system('uname'), '\n', '', '')
+  let s:os = 'unix'
   let s:VIMFILES = $HOME . '/.vim'
 else
   let s:os = 'undefined'
@@ -81,8 +81,8 @@ endif
 runtime ftplugin/man.vim
 
 function! Cond(cond, ...)
-  let opts = get(a:000, 0, {})
-  return a:cond ? opts : extend(opts, { 'on': [], 'for': [] })
+  let l:opts = get(a:000, 0, {})
+  return a:cond ? l:opts : extend(l:opts, { 'on': [], 'for': [] })
 endfunction
 
 let g:has_python = (has('python') || has('python3'))
@@ -91,11 +91,11 @@ let g:plug_window = 'enew'
 
 call plug#begin(s:VIMFILES . '/plugged')
 
+Plug 'SirVer/ultisnips',        Cond(g:has_python)
 Plug 'Valloric/MatchTagAlways', Cond(g:has_python)
-Plug 'google/vim-codereview', Cond(g:has_python)
-Plug 'google/vim-glaive', Cond(g:has_python)
-Plug 'google/vim-maktaba', Cond(g:has_python)
-Plug 'SirVer/ultisnips', Cond(g:has_python)
+Plug 'google/vim-codereview',   Cond(g:has_python)
+Plug 'google/vim-glaive',       Cond(g:has_python)
+Plug 'google/vim-maktaba',      Cond(g:has_python)
 
 Plug 'Shougo/deoplete.nvim', Cond(has('nvim'), { 'do': ':UpdateRemotePlugins' })
 Plug 'Shougo/neocomplete.vim', Cond(!has('nvim'))
@@ -134,7 +134,6 @@ Plug 'rhysd/nyaovim-popup-tooltip'
 Plug 'rhysd/nyaovim-running-gopher'
 Plug 'rhysd/vim-crystal'
 Plug 'rhysd/vim-gfm-syntax'
-Plug 'roryokane/detectindent' | let s:detect_indent_loaded = 1
 Plug 'snaewe/Instantly_Better_Vim_2013'
 Plug 'suy/vim-context-commentstring'
 Plug 'tmux-plugins/vim-tmux'
@@ -154,6 +153,7 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'wellle/tmux-complete.vim'
 Plug 'whatyouhide/vim-lengthmatters'
 
+" Plug 'roryokane/detectindent' | let s:detect_indent_loaded = 1
 " Plug 'wlangstroth/vim-racket'
 
 call plug#end()
@@ -162,6 +162,9 @@ call plug#end()
 " ===============================================================
 " Plugin settings {{{
 " ===============================================================
+
+" Tmux stuff
+let g:tmux_navigator_disable_when_zoomed = 1
 
 " vim-crystal
 let g:crystal_define_mappings = 0 " Don't interfere with commentary
@@ -194,7 +197,7 @@ let g:conoline_use_colorscheme_default_normal = 1
 let g:conoline_use_colorscheme_default_insert = 1
 
 if executable('ag')
-  let g:ackprg = 'ag'
+  let g:ackprg = 'ag --smart-case'
 endif
 
 highlight GitGutterAdd    cterm=bold ctermfg=green
@@ -510,7 +513,6 @@ endfunction
 
 function! s:OpenFunction(...)
   for l:f in a:000
-    echo l:f
     call netrw#BrowseX(l:f, netrw#CheckIfRemote())
   endfor
 endfunction
@@ -576,9 +578,6 @@ noremap  <silent> <leader>sv :<C-u>source $MYVIMRC<CR>
 
 nnoremap <silent> <leader>f  :echo expand('%')<CR>
 nnoremap <silent> <leader>w  :<C-u>silent call FixWhiteSpace()<CR>
-
-" Run last make target
-nnoremap <silent> <leader>m  :make<Up><CR>
 
 nnoremap          <leader>2  A >&2<ESC>
 
