@@ -104,7 +104,6 @@ Plug 'chrisbra/vim-diff-enhanced', Cond(v:version >= 704)
 
 Plug 'Shougo/neco-syntax'
 Plug 'Shougo/neco-vim'
-Plug 'hail2u/vim-css3-syntax'
 Plug 'airblade/vim-gitgutter'
 Plug 'alvan/vim-closetag'
 Plug 'bogado/file-line'
@@ -112,6 +111,7 @@ Plug 'christoomey/vim-tmux-navigator'
 Plug 'dag/vim-fish'
 Plug 'elzr/vim-json'
 Plug 'fatih/vim-go'
+Plug 'hail2u/vim-css3-syntax'
 Plug 'honza/vim-snippets'
 Plug 'idanarye/vim-merginal'
 Plug 'jlanzarotta/bufexplorer'
@@ -260,17 +260,18 @@ if exists('s:detect_indent_loaded')
 endif
 
 " Fugitive settings
-nnoremap <silent> <leader>gs  :<C-u>Gstatus<CR>
-nnoremap <silent> <leader>ga  :<C-u>Gwrite<CR>
-nnoremap <silent> <leader>gc  :<C-u>Gcommit<CR>
-nnoremap <silent> <leader>gps :<C-u>Gpush<CR>
-nnoremap <silent> <leader>gd  :<C-u>Gdiff<CR>
-nnoremap <silent> <leader>ghh :<C-u>Gdiff HEAD<CR>
-nnoremap <silent> <leader>gH  :<C-u>Gdiff HEAD<CR>
-nnoremap <silent> <leader>gh1 :<C-u>Gdiff HEAD~1<CR>
+nnoremap          <leader>gdm :<C-u>Gdiff master<CR>
 nnoremap          <leader>gh  :<C-u>Gdiff HEAD~
+nnoremap <silent> <leader>gH  :<C-u>Gdiff HEAD<CR>
+nnoremap <silent> <leader>ga  :<C-u>Gwrite<CR>
 nnoremap <silent> <leader>gb  :<C-u>Gblame<CR>
+nnoremap <silent> <leader>gc  :<C-u>Gcommit<CR>
+nnoremap <silent> <leader>gd  :<C-u>Gdiff<CR>
+nnoremap <silent> <leader>gh1 :<C-u>Gdiff HEAD~1<CR>
+nnoremap <silent> <leader>ghh :<C-u>Gdiff HEAD<CR>
 nnoremap <silent> <leader>gi  :<C-u>GEditIgnore<CR>
+nnoremap <silent> <leader>gps :<C-u>Gpush<CR>
+nnoremap <silent> <leader>gs  :<C-u>Gstatus<CR>
 
 " Vim-plug mappings
 nnoremap <silent> <leader>vu :<C-u>PlugUpdate<CR>
