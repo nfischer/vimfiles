@@ -34,6 +34,7 @@ set diffopt=filler,vertical
 set foldlevel=0
 set foldmethod=marker
 set gdefault                " Add g flag to search/replace
+set guioptions=T
 set hidden                  " Buffers finally don't suck
 set history=10000
 set hlsearch                " highlights search results
@@ -42,7 +43,9 @@ set incsearch               " searches as you type
 set lazyredraw
 set list
 set modelines=0             " Security reasons
+set mouse=a
 set nobackup                " no annoying file.txt~ files
+set noerrorbells
 set nojoinspaces            " Only insert a single space after punctuation
 set noshowmode              " Handled by airline
 set number numberwidth=1
@@ -54,12 +57,14 @@ set smartindent
 set splitbelow
 set t_Co=256
 set t_ut=
+set t_vb=
 set textwidth=80
 set timeoutlen=1000         " But still give me time to enter leader commands
 set ttimeoutlen=200         " Exit insert mode quickly
-set undolevels=1000
 set undofile                " Preserve undo history between sessions
+set undolevels=1000
 set virtualedit=block       " makes virtual blocks cleaner and blockier
+set visualbell
 set wildignore+=.DS_Store,*.swp,*.bak,*.pyc,*.class,*.o,*.obj
 set winaltkeys=no           " Don't let Windows eat the alt-key
 
@@ -79,7 +84,10 @@ function! Cond(cond, ...)
   let opts = get(a:000, 0, {})
   return a:cond ? opts : extend(opts, { 'on': [], 'for': [] })
 endfunction
+
 let g:has_python = (has('python') || has('python3'))
+
+let g:plug_window = 'enew'
 
 call plug#begin(s:VIMFILES . '/plugged')
 
@@ -94,6 +102,9 @@ Plug 'Shougo/neocomplete.vim', Cond(!has('nvim'))
 
 Plug 'chrisbra/vim-diff-enhanced', Cond(v:version >= 704)
 
+Plug 'Shougo/neco-syntax'
+Plug 'Shougo/neco-vim'
+Plug 'hail2u/vim-css3-syntax'
 Plug 'airblade/vim-gitgutter'
 Plug 'alvan/vim-closetag'
 Plug 'bogado/file-line'
@@ -102,6 +113,7 @@ Plug 'dag/vim-fish'
 Plug 'elzr/vim-json'
 Plug 'fatih/vim-go'
 Plug 'honza/vim-snippets'
+Plug 'idanarye/vim-merginal'
 Plug 'jlanzarotta/bufexplorer'
 Plug 'junegunn/vim-easy-align'
 Plug 'junegunn/vim-slash'
@@ -131,13 +143,14 @@ Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-dispatch'
 Plug 'tpope/vim-eunuch'
-Plug 'tpope/vim-fugitive' | let s:fugitive_loaded = 1
+Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-vinegar'
 Plug 'tyrannicaltoucan/vim-quantum' | let s:quantum_loaded = 1
 Plug 'vim-airline/vim-airline' | let s:airline_loaded = 1
+Plug 'vim-airline/vim-airline-themes'
 Plug 'wellle/tmux-complete.vim'
 Plug 'whatyouhide/vim-lengthmatters'
 
@@ -194,9 +207,9 @@ highlight MatchParen cterm=bold ctermfg=lightblue ctermbg=NONE
 let g:deoplete#enable_at_startup = 1
 let g:neocomplete#enable_at_startup = 1
 
-if has('nvim') || has('job')
+let g:neomake_javascript_enabled_makers = ['eslint']
 
-  let g:neomake_javascript_enabled_makers = ['eslint']
+if has('nvim') || has('job')
   if exists('s:neomake_loaded')
     augroup Neomake
       au!
@@ -247,30 +260,21 @@ if exists('s:detect_indent_loaded')
 endif
 
 " Fugitive settings
-if exists('s:fugitive_loaded')
-  nnoremap <silent> <leader>gs  :<C-u>Gstatus<CR>
-  nnoremap <silent> <leader>ga  :<C-u>Gwrite<CR>
-  nnoremap <silent> <leader>gc  :<C-u>Gcommit<CR>
-  nnoremap <silent> <leader>gps :<C-u>Gpush<CR>
-  nnoremap <silent> <leader>gd  :<C-u>Gdiff<CR>
-  nnoremap <silent> <leader>ghh :<C-u>Gdiff HEAD<CR>
-  nnoremap <silent> <leader>gH  :<C-u>Gdiff HEAD<CR>
-  nnoremap <silent> <leader>gh1 :<C-u>Gdiff HEAD~1<CR>
-  nnoremap          <leader>gh  :<C-u>Gdiff HEAD~
-  nnoremap <silent> <leader>gpc :<C-u>Git pc<CR>
-  nnoremap <silent> <leader>gb  :<C-u>Gblame<CR>
-  nnoremap <silent> <leader>gi  :<C-u>GEditIgnore<CR>
-endif
+nnoremap <silent> <leader>gs  :<C-u>Gstatus<CR>
+nnoremap <silent> <leader>ga  :<C-u>Gwrite<CR>
+nnoremap <silent> <leader>gc  :<C-u>Gcommit<CR>
+nnoremap <silent> <leader>gps :<C-u>Gpush<CR>
+nnoremap <silent> <leader>gd  :<C-u>Gdiff<CR>
+nnoremap <silent> <leader>ghh :<C-u>Gdiff HEAD<CR>
+nnoremap <silent> <leader>gH  :<C-u>Gdiff HEAD<CR>
+nnoremap <silent> <leader>gh1 :<C-u>Gdiff HEAD~1<CR>
+nnoremap          <leader>gh  :<C-u>Gdiff HEAD~
+nnoremap <silent> <leader>gb  :<C-u>Gblame<CR>
+nnoremap <silent> <leader>gi  :<C-u>GEditIgnore<CR>
 
-" Vundle mappings
+" Vim-plug mappings
 nnoremap <silent> <leader>vu :<C-u>PlugUpdate<CR>
 nnoremap <silent> <leader>vi :<C-u>PlugInstall<CR>
-
-" Tmux mappings
-nnoremap <silent> <Left>    :TmuxNavigateLeft<cr>
-nnoremap <silent> <Down>    :TmuxNavigateDown<cr>
-nnoremap <silent> <Up>      :TmuxNavigateUp<cr>
-nnoremap <silent> <Right>   :TmuxNavigateRight<cr>
 
 " }}}
 " ===============================================================
@@ -308,19 +312,12 @@ endif
 " Autocommenting is removed by a plugin
 
 " Configure the mouse (scrolling only)
-set mouse=a
 noremap  <LeftMouse>   <nop>
 noremap  <LeftRelease> <nop>
 noremap  <RightMouse>  <nop>
 inoremap <LeftMouse>   <nop>
 inoremap <LeftRelease> <nop>
 inoremap <RightMouse>  <nop>
-
-if has('gui_running')
-  " GUI specific
-  set noerrorbells visualbell t_vb=
-  set guioptions=T
-endif
 
 " }}}
 " ===============================================================
@@ -348,13 +345,14 @@ cnoremap  <C-a> <home>
 
 " Prevents annoying behavior
 nnoremap          Q     <nop>
-nnoremap          <C-z> <nop>
 nnoremap <silent> K     k:echoerr 'CAPSLOCK IS ON'<CR>
 nnoremap <silent> J     j:echoerr 'CAPSLOCK IS ON'<CR>
 vnoremap <silent> K     k:<C-u>echoerr 'CAPSLOCK IS ON'<CR>gv
 vnoremap <silent> J     j:<C-u>echoerr 'CAPSLOCK IS ON'<CR>gv
 cnoremap          q~    q!
 cnoremap          q1    q!
+
+nnoremap <silent> <leader>ll :<C-u>nohl<CR><C-l>
 
 " <C-a> highlights all, + will increment numbers
 nnoremap + <C-a>
@@ -425,44 +423,6 @@ nmap         ++  vip++
 " Leader functions {{{
 " ===============================================================
 
-" Times the number of times a particular command takes to execute the specified
-" number of times (in seconds).
-function! HowLong(number_of_times, ...)
-  " We don't want to be prompted by a message if the command being tried is
-  " an echo as that would slow things down while waiting for user input.
-  let l:command = join(a:000)
-  echo 'Running "' . l:command . '" ' . a:number_of_times . ' times'
-
-  let l:old_more = &more
-  set nomore
-  let l:start_time = localtime()
-  for l:i in range(a:number_of_times)
-    exe l:command
-  endfor
-  let l:result = localtime() - l:start_time
-  let &more = l:old_more
-  return l:result
-endfunction
-
-function! ToggleTest() " for ShellJS/cash
-  if getcwd() =~# 'src/commands'
-    cd ..
-    let l:new_dir = 'test'
-  elseif getcwd() =~# 'src'
-    let l:new_dir = 'test'
-  elseif getcwd() =~# 'test'
-    let l:new_dir = 'src'
-    if isdirectory('../src/commands/')
-      let l:new_dir = l:new_dir . '/commands'
-    endif
-  else
-    " error
-    echohl ErrorMsg | echo "Can't find your directory" | echohl NONE
-    return 1
-  endif
-  exe 'edit ../' . l:new_dir . '/' . expand('%:t')
-endfunction
-
 function! s:RenameTokenFunction(orig, new) range
   if a:orig ==# a:new
     echoerr 'These are the same thing!'
@@ -482,18 +442,6 @@ function! s:RenameTokenFunction(orig, new) range
   let &gdefault = l:old_gdefault
   echo a:orig . ' -> ' . a:new
   call setreg('/', l:old_search)
-endfunction
-
-" a:orig is the original indent, and a:new is the preferred new indent
-function! s:ChangeIndentFunc(orig, new)
-  let l:old_et = &expandtab
-  exe 'set ts=' . a:orig . ' sts=' . a:orig . ' noet'
-  retab!
-  exe 'set ts=' . a:new . ' sts=' . a:new . ' sw=' . a:new
-  if (l:old_et)
-    set expandtab
-  endif
-  retab
 endfunction
 
 function! MoveSplit(dir)
@@ -559,26 +507,10 @@ function! s:SudoWriteFile()
   silent write !sudo tee % >/dev/null
 endfunction
 
-let s:open_cmd = ''
-if s:os ==# 'Linux'
-  let s:open_cmd = 'xdg-open'
-elseif s:os ==# 'Darwin'
-  let s:open_cmd = 'open'
-endif " Windows?
-
-" TODO(nate): make this a snippet
-function! InsertIFS()
-  let l:lines = ['old_IFS=${IFS}', "IFS='", "'", 'IFS=${old_IFS}']
-  for l:line in l:lines
-    put=l:line
-  endfor
-endfunction
-
 function! s:OpenFunction(...)
   for l:f in a:000
     echo l:f
-    " asynchronously open l:f
-    call system(s:open_cmd . ' ' . l:f . '&>/dev/null &')
+    call netrw#BrowseX(l:f, netrw#CheckIfRemote())
   endfor
 endfunction
 
@@ -626,13 +558,10 @@ endfunction
 " Leader mappings {{{
 " ===============================================================
 
-nnoremap <silent> <leader>tt :call ToggleTest()<CR>
 nnoremap <silent> <leader>nt :!npm test<CR>
 nnoremap          <leader>sq ciwsquash<Esc>b
-nnoremap          <leader>bu :b<Space>
 nnoremap          <leader>rf :RenameToken <C-r><C-w><space>
 vnoremap          <leader>rf :RenameToken<space>
-nnoremap <silent> <leader>qf :<C-u>cwindow<CR>
 nnoremap <silent> <leader>C  :let &scrolloff=999-&scrolloff<CR>
 noremap  <silent> <leader>ev :<C-u>call EditConfigFile($MYVIMRC)<CR>
 noremap  <silent> <leader>ea :<C-u>call
@@ -643,8 +572,6 @@ noremap  <silent> <leader>et :<C-u>call
     \ EditConfigFile(expand('~/.tmux.conf'))<CR>
 noremap  <silent> <leader>ep :<C-u>call EditConfigFile(expand('~/.profile'))<CR>
 noremap  <silent> <leader>sv :<C-u>source $MYVIMRC<CR>
-noremap  <silent> <leader>ef :<C-u>exe 'vsp ' . expand('<cfile>')<CR>
-noremap  <silent> <leader>ec :<C-u>exe 'vsp ' . expand('<cfile>:r') . '.c'<CR>
 
 nnoremap <silent> <leader>f  :echo expand('%')<CR>
 nnoremap <silent> <leader>w  :<C-u>silent call FixWhiteSpace()<CR>
@@ -653,7 +580,6 @@ nnoremap <silent> <leader>w  :<C-u>silent call FixWhiteSpace()<CR>
 nnoremap <silent> <leader>m  :make<Up><CR>
 
 nnoremap          <leader>2  A >&2<ESC>
-nnoremap <silent> <leader>i  :call InsertIFS()<CR>
 
 " }}}
 " ===============================================================
@@ -673,9 +599,6 @@ command! -nargs=+ -complete=command      Profile echo HowLong(<f-args>)
 command! -nargs=* -complete=var -range=% RenameToken <line1>,<line2>
     \ call s:RenameTokenFunction(<f-args>)
 
-command! -nargs=+                        ChangeIndent
-    \ call s:ChangeIndentFunc(<f-args>)
-
 " Enable saving read-only files using sudo
 command! -nargs=0                        W call s:SudoWriteFile()
 
@@ -683,16 +606,6 @@ command! -nargs=0                        W call s:SudoWriteFile()
 command! -nargs=+ -complete=file         Open call s:OpenFunction(<f-args>)
 command! -nargs=* -complete=file         Ls echo system('ls --color=auto ' . <q-args>)
 command! -nargs=* -complete=file         Wc call s:WordCount(<f-args>)
-
-"==== Make whitespace visible, but not in insert mode ===="
-
-" vint: -ProhibitUnnecessaryDoubleQuote
-exe "set listchars=tab:\uB6~,trail:\uB7,nbsp:~"
-" vint: +ProhibitUnnecessaryDoubleQuote
-
-"==== Vim Window setup ===="
-nnoremap <silent> <C-w>h :call MoveSplit('left')<CR>
-nnoremap <silent> <C-w>l :call MoveSplit('right')<CR>
 
 " }}}
 " ===============================================================
@@ -774,10 +687,11 @@ augroup FileTypeOptions
   autocmd FileType bash,python              setlocal commentstring=#\ %s
   autocmd FileType vim                      setlocal commentstring=\"\ %s
   autocmd FileType gitcommit,markdown       setlocal spell
+  autocmd FileType gitcommit normal! gg
   autocmd FileType scheme                   setlocal lisp
   autocmd BufNewfile,BufReadPost *.md set filetype=markdown
   autocmd BufNewfile,BufReadPost *.pl set filetype=prolog
-  autocmd BufNewfile,BufReadPost *.zshrc set filetype=zsh
+  autocmd BufNewfile,BufReadPost *.zshrc,*.zsh-theme set filetype=zsh
   autocmd BufNewfile,BufReadPost *.bashrc set filetype=sh
 augroup END
 
@@ -789,11 +703,26 @@ augroup InsertEvents
 augroup END
 
 " }}}
+" ===============================================================
+" Miscellaneous {{{
+" ===============================================================
+
+"==== Make whitespace visible, but not in insert mode ===="
+
+" vint: -ProhibitUnnecessaryDoubleQuote
+exe "set listchars=tab:\uB6~,trail:\uB7,nbsp:~"
+" vint: +ProhibitUnnecessaryDoubleQuote
+
+"==== Vim Window setup ===="
+nnoremap <silent> <C-w>h :call MoveSplit('left')<CR>
+nnoremap <silent> <C-w>l :call MoveSplit('right')<CR>
+
+" }}}
 " ============================================================================
-" Misc. {{{
+" After {{{
 " ============================================================================
 
-" These settings need to be reset
+" These settings need to be reset near the end of the vimrc
 set nocursorcolumn
 nohlsearch
 
