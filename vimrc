@@ -42,6 +42,7 @@ set ignorecase smartcase    " case insensitive for all-lower searches
 set incsearch               " searches as you type
 set lazyredraw
 set list
+set matchpairs+=<:>
 set modelines=0             " Security reasons
 set mouse=a
 set nobackup                " no annoying file.txt~ files
