@@ -92,7 +92,7 @@ let g:plug_window = 'enew'
 
 call plug#begin(s:VIMFILES . '/plugged')
 
-Plug 'SirVer/ultisnips',        Cond(g:has_python)
+Plug 'SirVer/ultisnips',        Cond(g:has_python && v:version >= 704)
 Plug 'Valloric/MatchTagAlways', Cond(g:has_python)
 Plug 'google/vim-codereview',   Cond(g:has_python)
 Plug 'google/vim-glaive',       Cond(g:has_python)
@@ -102,6 +102,7 @@ Plug 'Shougo/deoplete.nvim', Cond(has('nvim'), { 'do': ':UpdateRemotePlugins' })
 Plug 'Shougo/neocomplete.vim', Cond(!has('nvim'))
 
 Plug 'chrisbra/vim-diff-enhanced', Cond(v:version >= 704)
+Plug 'jlanzarotta/bufexplorer', Cond(v:version >= 704)
 
 Plug 'Shougo/neco-syntax'
 Plug 'Shougo/neco-vim'
@@ -115,7 +116,6 @@ Plug 'fatih/vim-go'
 Plug 'hail2u/vim-css3-syntax'
 Plug 'honza/vim-snippets'
 Plug 'idanarye/vim-merginal'
-Plug 'jlanzarotta/bufexplorer'
 Plug 'junegunn/vim-easy-align'
 Plug 'junegunn/vim-slash'
 Plug 'luochen1990/rainbow'
