@@ -2,6 +2,7 @@
 " Vimrc and gVimrc file
 
 let g:mapleader = ','
+let s:local_vimrc = $HOME . '/.vimrc.local'
 
 " ===============================================================
 " System Information {{{
@@ -108,7 +109,6 @@ Plug 'Shougo/neco-syntax'
 Plug 'Shougo/neco-vim'
 Plug 'airblade/vim-gitgutter'
 Plug 'alvan/vim-closetag'
-Plug 'bogado/file-line'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'dag/vim-fish'
 Plug 'elzr/vim-json'
@@ -154,6 +154,7 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'wellle/tmux-complete.vim'
 Plug 'whatyouhide/vim-lengthmatters'
 
+" Plug 'bogado/file-line'
 " Plug 'roryokane/detectindent' | let s:detect_indent_loaded = 1
 " Plug 'wlangstroth/vim-racket'
 
@@ -562,7 +563,6 @@ endfunction
 " Leader mappings {{{
 " ===============================================================
 
-nnoremap <silent> <leader>nt :!npm test<CR>
 nnoremap          <leader>sq ciwsquash<Esc>b
 nnoremap          <leader>rf :RenameToken <C-r><C-w><space>
 vnoremap          <leader>rf :RenameToken<space>
@@ -572,10 +572,11 @@ noremap  <silent> <leader>ea :<C-u>call
     \ EditConfigFile(expand('~/.shell_aliases'))<CR>
 noremap  <silent> <leader>eb :<C-u>call EditConfigFile(expand('~/.bashrc'))<CR>
 noremap  <silent> <leader>ez :<C-u>call EditConfigFile(expand('~/.zshrc'))<CR>
+noremap  <silent> <leader>eV :<C-u>call EditConfigFile(s:local_vimrc)<CR>
+noremap  <silent> <leader>eB :<C-u>call EditConfigFile(expand('~/.bashrc.local'))<CR>
+noremap  <silent> <leader>eZ :<C-u>call EditConfigFile(expand('~/.zshrc.local'))<CR>
 noremap  <silent> <leader>et :<C-u>call
     \ EditConfigFile(expand('~/.tmux.conf'))<CR>
-noremap  <silent> <leader>ep :<C-u>call EditConfigFile(expand('~/.profile'))<CR>
-noremap  <silent> <leader>sv :<C-u>source $MYVIMRC<CR>
 
 nnoremap <silent> <leader>f  :echo expand('%')<CR>
 nnoremap <silent> <leader>w  :<C-u>silent call FixWhiteSpace()<CR>
@@ -671,14 +672,10 @@ augroup ErrorBells
   autocmd GUIEnter * set vb t_vb=
 augroup END
 
-"====[ Open any file with a pre-existing swapfile in readonly mode ]===="
+" This is also handled in the Instantly_Better_Vim_2013 plugin
 augroup NoSimultaneousEdits
   autocmd!
   autocmd SwapExists * let v:swapchoice = 'o'
-  autocmd SwapExists * echohl ErrorMsg
-  autocmd SwapExists * echomsg 'Duplicate edit session (readonly)'
-  autocmd SwapExists * echohl NONE
-  autocmd SwapExists * sleep 1
 augroup END
 
 augroup FileTypeOptions
@@ -732,7 +729,6 @@ nohlsearch
 " Local vimrc {{{
 " ============================================================================
 
-let s:local_vimrc = $HOME . '/.local.vimrc'
 if filereadable(s:local_vimrc)
   execute 'source' . s:local_vimrc
 endif
