@@ -3,7 +3,7 @@
 Feel free to use what you like. This is my personal configuration though, so I
 don't recommend you use this repo directly (I add tons of breaking changes).
 
-## Compatibility (guaranteed)
+## Compatibility (supported)
 
  - running within tmux 2.2+
  - vim 8.0+ or nvim 2.0+
