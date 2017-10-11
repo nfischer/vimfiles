@@ -3,6 +3,8 @@
 Feel free to use what you like. This is my personal configuration though, so I
 don't recommend you use this repo directly (I add tons of breaking changes).
 
+If you like this, check out my [dotfiles](https://github.com/nfischer/dotfiles)!
+
 ## Compatibility (supported)
 
  - running within tmux 2.2+
