@@ -4,7 +4,7 @@ sudo: false
 before_install:
   - vim --version
 install:
-  - ./install.sh
+  - ln -s "$PWD/vimrc" ~/.vimrc && ./install.sh
 script:
   - vim '+qa' && vim '+PlugInstall --sync' '+qa'
 os:
