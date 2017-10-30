@@ -1,9 +1,8 @@
 language: generic
 sudo: false
 
-# keep this blank to make sure there are no before_install steps
 before_install:
-
+  - vim --version
 install:
   - ./install.sh
 script:
