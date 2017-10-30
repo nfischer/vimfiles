@@ -685,7 +685,8 @@ augroup FileTypeOptions
   autocmd FileType bash,python              setlocal commentstring=#\ %s
   autocmd FileType vim                      setlocal commentstring=\"\ %s
   autocmd FileType gitcommit,markdown       setlocal spell
-  autocmd FileType gitcommit normal! gg
+  autocmd FileType gitcommit call matchadd('ErrorMsg','Fixed') " should be 'Fixes'
+  autocmd FileType gitcommit                normal! gg
   autocmd FileType scheme                   setlocal lisp
   autocmd BufNewfile,BufReadPost *.md set filetype=markdown
   autocmd BufNewfile,BufReadPost *.pl set filetype=prolog
