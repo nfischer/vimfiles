@@ -154,6 +154,11 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'wellle/tmux-complete.vim'
 Plug 'whatyouhide/vim-lengthmatters'
 
+let s:local_vimplug = $HOME . '/.local-plugins.vim'
+if filereadable(s:local_vimplug)
+  execute 'source' . s:local_vimplug
+endif
+
 " Plug 'bogado/file-line'
 " Plug 'roryokane/detectindent' | let s:detect_indent_loaded = 1
 " Plug 'wlangstroth/vim-racket'
