@@ -1,12 +1,18 @@
 language: generic
 sudo: false
 
+env:
+  - EDITOR="vim"
+
 before_install:
-  - vim --version
+  - "$EDITOR" --version
 install:
-  - ln -s "$PWD/vimrc" ~/.vimrc && ./install.sh
+  - ln -s "$PWD/vimrc" ~/.vimrc
+  - ln -s "$PWD" ~/.vim
+  - ln -s "$PWD" ~/.config/nvim
+  - ./install.sh
 script:
-  - vim '+qa' && vim '+PlugInstall --sync' '+qa'
+  - "$EDITOR" '+qa' && "$EDITOR" '+PlugInstall --sync' '+qa'
 os:
   - linux
   - osx
