@@ -5,14 +5,14 @@ env:
   - EDITOR="vim"
 
 before_install:
-  - "$EDITOR" --version
+  - $EDITOR --version
 install:
   - ln -s "$PWD/vimrc" ~/.vimrc
   - ln -s "$PWD" ~/.vim
   - ln -s "$PWD" ~/.config/nvim
   - ./install.sh
 script:
-  - "$EDITOR" '+qa' && "$EDITOR" '+PlugInstall --sync' '+qa'
+  - $EDITOR '+qa' && "$EDITOR" '+PlugInstall --sync' '+qa'
 os:
   - linux
   - osx
