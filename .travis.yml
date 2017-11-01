@@ -7,10 +7,6 @@ env:
 before_install:
   - $EDITOR --version
 install:
-  - ln -s "$PWD/vimrc" ~/.vimrc
-  - ln -s "$PWD" ~/.vim
-  - mkdir -p ~/.config/nvim/
-  - ln -s "$PWD" ~/.config/nvim
   - ./install.sh
 script:
   - $EDITOR -c 'qa'
