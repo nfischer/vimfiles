@@ -12,9 +12,14 @@ install:
   - ln -s "$PWD" ~/.config/nvim
   - ./install.sh
 script:
-  - $EDITOR '+qa' && "$EDITOR" '+PlugInstall --sync' '+qa'
+  - $EDITOR '+qa'
 os:
   - linux
   - osx
 notifications:
   email: false
+
+addons:
+  apt:
+    packages:
+    - vim-gnome
