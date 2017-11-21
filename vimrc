@@ -148,6 +148,7 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-vinegar'
 Plug 'tyrannicaltoucan/vim-quantum' | let s:quantum_loaded = 1
+" Plug 'itchyny/lightline.vim' | let s:lightline_loaded = 1
 Plug 'vim-airline/vim-airline' | let s:airline_loaded = 1
 Plug 'vim-airline/vim-airline-themes'
 Plug 'wellle/tmux-complete.vim'
@@ -194,6 +195,9 @@ endif
 
 if exists('s:quantum_loaded')
   let g:airline_theme = 'quantum'
+  let g:lightline = {
+      \ 'colorscheme': 'quantum',
+      \ }
   let g:quantum_black = 1
   colorscheme quantum
 endif
@@ -667,6 +671,9 @@ augroup ConfigReload
   autocmd BufWritePost $MYVIMRC source $MYVIMRC
   if exists('s:airline_loaded')
     autocmd BufWritePost $MYVIMRC AirlineRefresh
+  endif
+  if exists('s:lightline_loaded')
+    autocmd BufWritePost $MYVIMRC call lightline#enable()
   endif
 augroup END
 
