@@ -1,9 +1,11 @@
-" vim: set foldmethod=marker foldlevel=0:
-" Vimrc and gVimrc file
+" ===============================================================
+" High-level variables {{{
+" ===============================================================
 
 let g:mapleader = ','
 let s:local_vimrc = $HOME . '/.vimrc.local'
 
+" }}}
 " ===============================================================
 " System Information {{{
 " ===============================================================
@@ -459,13 +461,13 @@ function! s:RenameTokenFunction(orig, new) range
 endfunction
 
 function! MoveSplit(dir)
-  let l:left_cmd  = 'vertical resize -5'
-  let l:right_cmd = 'vertical resize +5'
   if (winnr() == 1 && a:dir ==# 'left') ||
       \ (winnr() == winnr('$') && a:dir !=# 'left')
-    exe l:left_cmd
+    " Move to the left
+    vertical resize -5
   else
-    exe l:right_cmd
+    " Move to the right
+    vertical resize +5
   endif
 endfunction
 
@@ -651,9 +653,9 @@ endfunction
 " Need to postpone using 'zv' until after reading the modelines.
 function! s:OpenFolds()
   if exists('b:doopenfold')
-    exe 'normal! zv'
+    normal! zv
     if(b:doopenfold > 1)
-      exe  '+'.1
+      normal! <CR>
     endif
     unlet b:doopenfold
   endif
