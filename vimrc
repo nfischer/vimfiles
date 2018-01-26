@@ -205,8 +205,8 @@ if exists('s:quantum_loaded')
 endif
 syntax on
 
-let g:conoline_use_colorscheme_default_normal = 1
-let g:conoline_use_colorscheme_default_insert = 1
+let g:conoline_color_normal_nr_dark = 'guifg=#69c5ce guibg=#181818'
+let g:conoline_color_insert_nr_dark = 'guifg=#69c5ce guibg=#000000'
 
 if executable('ag')
   let g:ackprg = 'ag --smart-case'
