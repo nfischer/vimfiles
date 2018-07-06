@@ -3,7 +3,7 @@
 " ===============================================================
 
 let g:mapleader = ','
-let s:local_vimrc = $HOME . '/.vimrc.local'
+let g:local_vimrc = $HOME . '/.vimrc.local'
 
 " }}}
 " ===============================================================
@@ -119,6 +119,7 @@ Plug 'hail2u/vim-css3-syntax'
 Plug 'honza/vim-snippets'
 Plug 'idanarye/vim-merginal'
 Plug 'junegunn/vim-easy-align'
+Plug 'junegunn/vim-peekaboo'
 Plug 'junegunn/vim-slash'
 Plug 'luochen1990/rainbow'
 Plug 'mileszs/ack.vim'
@@ -291,6 +292,11 @@ nnoremap <silent> <leader>gs  :<C-u>Gstatus<CR>
 " Vim-plug mappings
 nnoremap <silent> <leader>vu :<C-u>PlugUpdate<CR>
 nnoremap <silent> <leader>vi :<C-u>PlugInstall<CR>
+augroup VimPlug
+  autocmd!
+  " Jump directly into the commit preview.
+  autocmd FileType vim-plug nmap <buffer> o <plug>(plug-preview)<c-w>P
+augroup END
 
 " }}}
 " ===============================================================
@@ -384,6 +390,11 @@ endif
 nnoremap <silent> <leader>sp :setlocal spell!\|set spell?<CR>
 vnoremap <silent> <leader>sp :<C-u>setlocal spell!<CR>gv
 inoremap <C-l> <Esc>[s1z=`]a
+
+" Tell me the syntax group under the cursor
+nnoremap <leader>S :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'
+\ . synIDattr(synID(line("."),col("."),0),"name") . "> lo<"
+\ . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 
 " }}}
 " ===============================================================
@@ -582,7 +593,7 @@ noremap  <silent> <leader>ea :<C-u>call
     \ EditConfigFile(expand('~/.shell_aliases'))<CR>
 noremap  <silent> <leader>eb :<C-u>call EditConfigFile(expand('~/.bashrc'))<CR>
 noremap  <silent> <leader>ez :<C-u>call EditConfigFile(expand('~/.zshrc'))<CR>
-noremap  <silent> <leader>eV :<C-u>call EditConfigFile(s:local_vimrc)<CR>
+noremap  <silent> <leader>eV :<C-u>call EditConfigFile(g:local_vimrc)<CR>
 noremap  <silent> <leader>eB :<C-u>call EditConfigFile(expand('~/.bashrc.local'))<CR>
 noremap  <silent> <leader>eZ :<C-u>call EditConfigFile(expand('~/.zshrc.local'))<CR>
 noremap  <silent> <leader>et :<C-u>call
@@ -743,8 +754,8 @@ nohlsearch
 " Local vimrc {{{
 " ===============================================================
 
-if filereadable(s:local_vimrc)
-  execute 'source' . s:local_vimrc
+if filereadable(g:local_vimrc)
+  execute 'source' . g:local_vimrc
 endif
 
 " }}}
