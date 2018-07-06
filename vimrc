@@ -362,11 +362,13 @@ call s:SetAndMake('undodir', 'undodir')
 noremap  ;  :
 noremap  <Bslash>  ;
 
+" Macros should be easy to apply
+nnoremap Q @q
+
 " Force tmux to respect <C-a>
 cnoremap  <C-a> <home>
 
 " Prevents annoying behavior
-nnoremap          Q     <nop>
 nnoremap <silent> K     k:echoerr 'CAPSLOCK IS ON'<CR>
 nnoremap <silent> J     j:echoerr 'CAPSLOCK IS ON'<CR>
 vnoremap <silent> K     k:<C-u>echoerr 'CAPSLOCK IS ON'<CR>gv
@@ -376,10 +378,6 @@ cnoremap          q1    q!
 
 nnoremap <silent> <leader>ll :<C-u>nohl<CR><C-l>
 
-" <C-a> highlights all, + will increment numbers
-nnoremap + <C-a>
-nnoremap <C-a> ggVG
-
 " Adjust yanking to be more consistent with other conventions
 nnoremap Y y$
 
@@ -387,7 +385,7 @@ nnoremap Y y$
 if exists('+spelllang')
   set spelllang=en_us
 endif
-nnoremap <silent> <leader>sp :setlocal spell!\|set spell?<CR>
+nnoremap <silent> <leader>sp :setlocal spell!<Bar>set spell?<CR>
 vnoremap <silent> <leader>sp :<C-u>setlocal spell!<CR>gv
 inoremap <C-l> <Esc>[s1z=`]a
 
@@ -395,6 +393,17 @@ inoremap <C-l> <Esc>[s1z=`]a
 nnoremap <leader>S :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'
 \ . synIDattr(synID(line("."),col("."),0),"name") . "> lo<"
 \ . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
+
+" }}}
+" ===============================================================
+" Custom text objects {{{
+" ===============================================================
+
+" From https://github.com/junegunn/dotfiles/blob/master/vimrc
+
+" ie: inner entire (entire buffer)
+xnoremap <silent> ie gg0oG$
+onoremap <silent> ie :<C-U>execute "normal! m`"<Bar>keepjumps normal! ggVG<CR>
 
 " }}}
 " ===============================================================
@@ -714,7 +723,7 @@ augroup FileTypeOptions
   autocmd FileType scheme                   setlocal lisp
   autocmd BufNewfile,BufReadPost *.md set filetype=markdown
   autocmd BufNewfile,BufReadPost *.pl set filetype=prolog
-  autocmd BufNewfile,BufReadPost *.zshrc,*.zsh-theme set filetype=zsh
+  autocmd BufNewfile,BufReadPost *.zsh-theme set filetype=zsh
   autocmd BufNewfile,BufReadPost *.bashrc set filetype=sh
 augroup END
 
