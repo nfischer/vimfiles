@@ -114,7 +114,6 @@ Plug 'alvan/vim-closetag'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'dag/vim-fish'
 Plug 'elzr/vim-json'
-Plug 'fatih/vim-go'
 Plug 'hail2u/vim-css3-syntax'
 Plug 'honza/vim-snippets'
 Plug 'idanarye/vim-merginal'
@@ -151,11 +150,12 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-vinegar'
 Plug 'tyrannicaltoucan/vim-quantum' | let s:quantum_loaded = 1
-" Plug 'itchyny/lightline.vim' | let s:lightline_loaded = 1
 Plug 'vim-airline/vim-airline' | let s:airline_loaded = 1
+" Plug 'itchyny/lightline.vim' | let s:lightline_loaded = 1
 Plug 'vim-airline/vim-airline-themes'
 Plug 'wellle/tmux-complete.vim'
 Plug 'whatyouhide/vim-lengthmatters'
+Plug 'wlangstroth/vim-racket'
 
 let s:local_vimplug = $HOME . '/.local-plugins.vim'
 if filereadable(s:local_vimplug)
@@ -163,8 +163,8 @@ if filereadable(s:local_vimplug)
 endif
 
 " Plug 'bogado/file-line'
+" Plug 'fatih/vim-go'
 " Plug 'roryokane/detectindent' | let s:detect_indent_loaded = 1
-" Plug 'wlangstroth/vim-racket'
 
 call plug#end()
 
@@ -362,6 +362,9 @@ call s:SetAndMake('undodir', 'undodir')
 noremap  ;  :
 noremap  <Bslash>  ;
 
+" Space should do something useful
+nnoremap <silent> <space> :w<CR>
+
 " Macros should be easy to apply
 nnoremap Q @q
 
@@ -376,6 +379,7 @@ vnoremap <silent> J     j:<C-u>echoerr 'CAPSLOCK IS ON'<CR>gv
 cnoremap          q~    q!
 cnoremap          q1    q!
 
+" Clear/refresh the screen
 nnoremap <silent> <leader>ll :<C-u>nohl<CR><C-l>
 
 " Adjust yanking to be more consistent with other conventions
@@ -388,11 +392,6 @@ endif
 nnoremap <silent> <leader>sp :setlocal spell!<Bar>set spell?<CR>
 vnoremap <silent> <leader>sp :<C-u>setlocal spell!<CR>gv
 inoremap <C-l> <Esc>[s1z=`]a
-
-" Tell me the syntax group under the cursor
-nnoremap <leader>S :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'
-\ . synIDattr(synID(line("."),col("."),0),"name") . "> lo<"
-\ . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 
 " }}}
 " ===============================================================
@@ -612,6 +611,11 @@ nnoremap <silent> <leader>f  :echo expand('%')<CR>
 nnoremap <silent> <leader>w  :<C-u>silent call FixWhiteSpace()<CR>
 
 nnoremap          <leader>2  A >&2<ESC>
+
+" Tell me the syntax group under the cursor
+nnoremap <leader>S :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'
+\ . synIDattr(synID(line("."),col("."),0),"name") . "> lo<"
+\ . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
 
 " }}}
 " ===============================================================
