@@ -90,6 +90,7 @@ function! Cond(cond, ...)
 endfunction
 
 let g:has_python = (has('python') || has('python3'))
+let g:nvim_or_vim8 = (has('nvim') || v:version >= 800)
 
 let g:plug_window = 'enew'
 
@@ -101,8 +102,17 @@ Plug 'google/vim-codereview',   Cond(g:has_python)
 Plug 'google/vim-glaive',       Cond(g:has_python)
 Plug 'google/vim-maktaba',      Cond(g:has_python)
 
-Plug 'Shougo/deoplete.nvim', Cond(has('nvim'), { 'do': ':UpdateRemotePlugins' })
-Plug 'Shougo/neocomplete.vim', Cond(!has('nvim'))
+function! MaybeUpdateRemotePlugins()
+  if has('nvim')
+    UpdateRemotePlugins
+  endif
+endfunction
+
+" Prefer deoplete on nvim or vim8 (with dependencies), fallback to neocomplete.
+Plug 'Shougo/deoplete.nvim', Cond(g:nvim_or_vim8, { 'do': function('MaybeUpdateRemotePlugins') })
+Plug 'roxma/nvim-yarp', Cond(v:version >= 800)
+Plug 'roxma/vim-hug-neovim-rpc', Cond(v:version >= 800)
+Plug 'Shougo/neocomplete.vim', Cond(!g:nvim_or_vim8)
 
 Plug 'chrisbra/vim-diff-enhanced', Cond(v:version >= 704)
 Plug 'jlanzarotta/bufexplorer', Cond(v:version >= 704)
