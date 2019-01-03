@@ -102,7 +102,7 @@ Plug 'google/vim-codereview',   Cond(g:has_python)
 Plug 'google/vim-glaive',       Cond(g:has_python)
 Plug 'google/vim-maktaba',      Cond(g:has_python)
 
-function! MaybeUpdateRemotePlugins()
+function! MaybeUpdateRemotePlugins(info)
   if has('nvim')
     UpdateRemotePlugins
   endif
