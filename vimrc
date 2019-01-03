@@ -698,6 +698,7 @@ augroup END
 augroup ConfigReload
   autocmd!
   autocmd BufWritePost $MYVIMRC source $MYVIMRC
+  exe 'autocmd BufWritePost ' . g:local_vimrc . ' source ' . g:local_vimrc
   if exists('s:airline_loaded')
     autocmd BufWritePost $MYVIMRC AirlineRefresh
   endif
@@ -721,14 +722,21 @@ augroup FileTypeOptions
   autocmd FileType c,cpp,cs,java,markdown   setlocal commentstring=//\ %s
   autocmd FileType bash,python              setlocal commentstring=#\ %s
   autocmd FileType vim                      setlocal commentstring=\"\ %s
-  autocmd FileType gitcommit,markdown       setlocal spell
+
+  autocmd FileType markdown                 setlocal spell
+
+  autocmd FileType gitcommit                setlocal spell
   autocmd FileType gitcommit call matchadd('ErrorMsg','Fixed') " should be 'Fixes'
   autocmd FileType gitcommit                normal! gg
+  autocmd FileType gitcommit                iab <buffer> b: Bug:
+  autocmd FileType gitcommit                iab <buffer> t: Test:
+  autocmd FileType gitcommit                iab <buffer> f: Fixes:
+
   autocmd FileType scheme                   setlocal lisp
+
   autocmd BufNewfile,BufReadPost *.md set filetype=markdown
   autocmd BufNewfile,BufReadPost *.pl set filetype=prolog
   autocmd BufNewfile,BufReadPost *.zsh-theme set filetype=zsh
-  autocmd BufNewfile,BufReadPost *.bashrc set filetype=sh
 augroup END
 
 augroup InsertEvents
