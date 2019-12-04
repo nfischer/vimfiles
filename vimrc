@@ -279,15 +279,15 @@ if exists('s:detect_indent_loaded')
 endif
 
 " Fugitive settings
-nnoremap          <leader>gdm :<C-u>Gdiff master<CR>
-nnoremap          <leader>gh  :<C-u>Gdiff HEAD~
-nnoremap <silent> <leader>gH  :<C-u>Gdiff HEAD<CR>
+nnoremap          <leader>gdm :<C-u>Gdiffsplit master<CR>
+nnoremap          <leader>gh  :<C-u>Gdiffsplit HEAD~
+nnoremap <silent> <leader>gH  :<C-u>Gdiffsplit HEAD<CR>
 nnoremap <silent> <leader>ga  :<C-u>Gwrite<CR>
 nnoremap <silent> <leader>gb  :<C-u>Gblame<CR>
 nnoremap <silent> <leader>gc  :<C-u>Gcommit<CR>
-nnoremap <silent> <leader>gd  :<C-u>Gdiff<CR>
-nnoremap <silent> <leader>gh1 :<C-u>Gdiff HEAD~1<CR>
-nnoremap <silent> <leader>ghh :<C-u>Gdiff HEAD<CR>
+nnoremap <silent> <leader>gd  :<C-u>Gdiffsplit<CR>
+nnoremap <silent> <leader>gh1 :<C-u>Gdiffsplit HEAD~1<CR>
+nnoremap <silent> <leader>ghh :<C-u>Gdiffsplit HEAD<CR>
 nnoremap <silent> <leader>gi  :<C-u>GEditIgnore<CR>
 nnoremap <silent> <leader>gps :<C-u>Gpush<CR>
 nnoremap <silent> <leader>gs  :<C-u>Gstatus<CR>
