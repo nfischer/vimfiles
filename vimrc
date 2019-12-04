@@ -716,6 +716,12 @@ augroup NoSimultaneousEdits
   autocmd SwapExists * let v:swapchoice = 'o'
 augroup END
 
+function! s:GitCommitSyntax()
+  " TODO(nfischer): consider implementing hashtag highlighting
+  syntax match Type '\v^(Bug|Fixes|Test|Change-Id):@='
+  syntax match SpellBad '\v^(Fixed):@=' " should be 'Fixes'
+endfunction
+
 augroup FileTypeOptions
   " Configure comment patterns and other things
   autocmd!
@@ -726,7 +732,7 @@ augroup FileTypeOptions
   autocmd FileType markdown                 setlocal spell
 
   autocmd FileType gitcommit                setlocal spell
-  autocmd FileType gitcommit call matchadd('ErrorMsg','Fixed') " should be 'Fixes'
+  autocmd FileType gitcommit                call s:GitCommitSyntax()
   autocmd FileType gitcommit                normal! gg
   autocmd FileType gitcommit                iab <buffer> b: Bug:
   autocmd FileType gitcommit                iab <buffer> t: Test:
