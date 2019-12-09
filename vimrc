@@ -745,6 +745,7 @@ augroup FileTypeOptions
   autocmd BufNewfile,BufReadPost *.zsh-theme set filetype=zsh
 augroup END
 
+"==== Make whitespace visible, but not in insert mode ===="
 augroup InsertEvents
   autocmd!
   autocmd InsertLeave * set iminsert=0
@@ -757,8 +758,7 @@ augroup END
 " Miscellaneous {{{
 " ===============================================================
 
-"==== Make whitespace visible, but not in insert mode ===="
-
+" Configure how whitespace characters appear
 " vint: -ProhibitUnnecessaryDoubleQuote
 exe "set listchars=tab:\uB6~,trail:\uB7,nbsp:~"
 " vint: +ProhibitUnnecessaryDoubleQuote
