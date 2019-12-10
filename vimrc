@@ -180,6 +180,18 @@ call plug#end()
 " Plugin settings {{{
 " ===============================================================
 
+" Configure markdown highlighting
+let g:markdown_fenced_languages = [
+  \ 'c',
+  \ 'cpp',
+  \ 'html',
+  \ 'java',
+  \ 'javascript', 'js=javascript',
+  \ 'python',
+  \ 'sh', 'bash=sh',
+  \ 'vim',
+  \ ]
+
 " Tmux stuff
 let g:tmux_navigator_disable_when_zoomed = 1
 
