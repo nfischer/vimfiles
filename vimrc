@@ -51,7 +51,7 @@ set mouse=a
 set nobackup                " no annoying file.txt~ files
 set noerrorbells
 set nojoinspaces            " Only insert a single space after punctuation
-set noshowmode              " Handled by airline
+set noshowmode              " Handled by airline/lightline
 set number numberwidth=1
 set ruler
 set scrolloff=4             " keep at least 4 lines above/below
@@ -128,6 +128,7 @@ Plug 'elzr/vim-json'
 Plug 'hail2u/vim-css3-syntax'
 Plug 'honza/vim-snippets'
 Plug 'idanarye/vim-merginal'
+Plug 'itchyny/lightline.vim' | let s:lightline_loaded = 1
 Plug 'junegunn/vim-easy-align'
 Plug 'junegunn/vim-peekaboo'
 Plug 'junegunn/vim-slash'
@@ -162,8 +163,8 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-vinegar'
 Plug 'tyrannicaltoucan/vim-quantum' | let s:quantum_loaded = 1
-Plug 'vim-airline/vim-airline' | let s:airline_loaded = 1
-Plug 'vim-airline/vim-airline-themes'
+" Plug 'vim-airline/vim-airline' | let s:airline_loaded = 1
+" Plug 'vim-airline/vim-airline-themes'
 Plug 'wellle/tmux-complete.vim'
 Plug 'whatyouhide/vim-lengthmatters'
 Plug 'wlangstroth/vim-racket'
@@ -220,6 +221,9 @@ endif
 
 if exists('s:quantum_loaded')
   let g:airline_theme = 'quantum'
+  let g:lightline = {
+      \ 'colorscheme': 'quantum',
+      \ }
   let g:quantum_black = 1
   colorscheme quantum
 endif
@@ -278,7 +282,7 @@ let g:rainbow_conf = {
     \   }
     \}
 
-" Airline settings
+" Airline/lightline settings
 set laststatus=2
 
 " PatienceDiff settings
