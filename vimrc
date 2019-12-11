@@ -180,16 +180,19 @@ call plug#end()
 " Plugin settings {{{
 " ===============================================================
 
-" Configure markdown highlighting
+" Configure markdown highlighting. See
+" https://github.com/github/linguist/blob/master/lib/linguist/languages.yml
 let g:markdown_fenced_languages = [
   \ 'c',
-  \ 'cpp',
+  \ 'cpp', 'cc=cpp',
   \ 'html',
   \ 'java',
   \ 'javascript', 'js=javascript',
+  \ 'json',
   \ 'python',
-  \ 'sh', 'bash=sh',
+  \ 'sh', 'bash=sh', 'shell=sh',
   \ 'vim',
+  \ 'xml',
   \ ]
 
 " Tmux stuff
