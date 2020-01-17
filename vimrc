@@ -129,6 +129,8 @@ Plug 'hail2u/vim-css3-syntax'
 Plug 'honza/vim-snippets'
 Plug 'idanarye/vim-merginal'
 Plug 'itchyny/lightline.vim' | let s:lightline_loaded = 1
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
 Plug 'junegunn/vim-easy-align'
 Plug 'junegunn/vim-peekaboo'
 Plug 'junegunn/vim-slash'
@@ -481,6 +483,10 @@ nmap         ++  vip++
 " Leader functions {{{
 " ===============================================================
 
+function! FindGitRoot()
+  return system('git rev-parse --show-toplevel 2> /dev/null')[:-2]
+endfunction
+
 function! s:RenameTokenFunction(orig, new) range
   if a:orig ==# a:new
     echoerr 'These are the same thing!'
@@ -630,8 +636,9 @@ noremap  <silent> <leader>eZ :<C-u>call EditConfigFile(expand('~/.zshrc.local'))
 noremap  <silent> <leader>et :<C-u>call
     \ EditConfigFile(expand('~/.tmux.conf'))<CR>
 
-nnoremap <silent> <leader>f  :echo expand('%')<CR>
 nnoremap <silent> <leader>w  :<C-u>silent call FixWhiteSpace()<CR>
+
+nnoremap <silent> <leader>f  :<C-u>execute 'Files' FindGitRoot()<CR>
 
 nnoremap          <leader>2  A >&2<ESC>
 
