@@ -138,7 +138,6 @@ Plug 'luochen1990/rainbow'
 Plug 'mileszs/ack.vim'
 Plug 'miyakogi/conoline.vim'
 Plug 'moll/vim-node'
-Plug 'neomake/neomake' | let s:neomake_loaded = 1
 Plug 'nfischer/vim-ohm'
 Plug 'nfischer/vim-potigol'
 Plug 'nfischer/vim-rainbows'
@@ -247,17 +246,6 @@ highlight MatchParen cterm=bold ctermfg=lightblue ctermbg=NONE
 
 let g:deoplete#enable_at_startup = 1
 let g:neocomplete#enable_at_startup = 1
-
-let g:neomake_javascript_enabled_makers = ['eslint']
-
-if has('nvim') || has('job')
-  if exists('s:neomake_loaded')
-    augroup Neomake
-      au!
-      au BufEnter,BufWritePost * Neomake
-    augroup END
-  endif
-endif
 
 " Rainbow parens
 let g:rainbow_active = 0
