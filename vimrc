@@ -101,6 +101,7 @@ Plug 'Valloric/MatchTagAlways', Cond(g:has_python, {'for': ['html', 'xml', 'jinj
 Plug 'google/vim-codereview',   Cond(g:has_python)
 Plug 'google/vim-glaive',       Cond(g:has_python)
 Plug 'google/vim-maktaba',      Cond(g:has_python)
+Plug 'google/vim-codefmt',      Cond(g:has_python)
 
 function! MaybeUpdateRemotePlugins(info)
   if has('nvim')
@@ -169,6 +170,8 @@ Plug 'tyrannicaltoucan/vim-quantum' | let s:quantum_loaded = 1
 Plug 'wellle/tmux-complete.vim'
 Plug 'whatyouhide/vim-lengthmatters'
 Plug 'wlangstroth/vim-racket'
+
+Plug 'https://gn.googlesource.com/gn', { 'rtp': 'misc/vim' }
 
 let s:local_vimplug = $HOME . '/.local-plugins.vim'
 if filereadable(s:local_vimplug)
@@ -665,6 +668,11 @@ command! -nargs=* -complete=file         Wc call s:WordCount(<f-args>)
 " ===============================================================
 " Autocommands {{{
 " ===============================================================
+
+augroup CodeFmt
+  autocmd!
+  autocmd FileType gn AutoFormatBuffer gn
+augroup END
 
 " Highlight VCS conflict markers
 augroup GitConflictMarkers
