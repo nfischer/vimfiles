@@ -180,6 +180,10 @@ endif
 
 call plug#end()
 
+if g:has_python
+  call glaive#Install()
+endif
+
 " }}}
 " ===============================================================
 " Plugin settings {{{
