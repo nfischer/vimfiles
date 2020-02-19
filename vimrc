@@ -90,18 +90,10 @@ function! Cond(cond, ...)
 endfunction
 
 let g:has_python = (has('python') || has('python3'))
-let g:nvim_or_vim8 = (has('nvim') || v:version >= 800)
 
 let g:plug_window = 'enew'
 
 call plug#begin(s:VIMFILES . '/plugged')
-
-Plug 'SirVer/ultisnips',        Cond(g:has_python && v:version >= 704)
-Plug 'Valloric/MatchTagAlways', Cond(g:has_python, {'for': ['html', 'xml', 'jinja']})
-Plug 'google/vim-codereview',   Cond(g:has_python)
-Plug 'google/vim-glaive',       Cond(g:has_python)
-Plug 'google/vim-maktaba',      Cond(g:has_python)
-Plug 'google/vim-codefmt',      Cond(g:has_python)
 
 function! MaybeUpdateRemotePlugins(info)
   if has('nvim')
@@ -109,11 +101,15 @@ function! MaybeUpdateRemotePlugins(info)
   endif
 endfunction
 
-" Prefer deoplete on nvim or vim8 (with dependencies), fallback to neocomplete.
-Plug 'Shougo/deoplete.nvim', Cond(g:nvim_or_vim8, { 'do': function('MaybeUpdateRemotePlugins') })
-Plug 'roxma/nvim-yarp', Cond(v:version >= 800)
-Plug 'roxma/vim-hug-neovim-rpc', Cond(v:version >= 800)
-Plug 'Shougo/neocomplete.vim', Cond(!g:nvim_or_vim8)
+Plug 'SirVer/ultisnips',        Cond(g:has_python && v:version >= 704)
+Plug 'Valloric/MatchTagAlways', Cond(g:has_python, {'for': ['html', 'xml', 'jinja']})
+Plug 'google/vim-codefmt',      Cond(g:has_python)
+Plug 'google/vim-codereview',   Cond(g:has_python)
+Plug 'google/vim-glaive',       Cond(g:has_python)
+Plug 'google/vim-maktaba',      Cond(g:has_python)
+
+Plug 'Shougo/deoplete.nvim', Cond(has('nvim'), { 'do': function('MaybeUpdateRemotePlugins') })
+Plug 'Shougo/neocomplete.vim', Cond(!has('nvim'))
 
 Plug 'chrisbra/vim-diff-enhanced', Cond(v:version >= 704)
 Plug 'jlanzarotta/bufexplorer', Cond(v:version >= 704)
