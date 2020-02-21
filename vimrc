@@ -722,21 +722,29 @@ function! s:GitCommitSyntax()
   syntax match SpellBad '\v^(Fixed):@=' " should be 'Fixes'
 endfunction
 
+function! s:GitCommitAbbrev()
+  inoreabbrev <buffer> b: Bug:
+  inoreabbrev <buffer> t: Test:
+  inoreabbrev <buffer> f: Fixes:
+  inoreabbrev <buffer> nctl No change to logic
+endfunction
+
 augroup FileTypeOptions
   " Configure comment patterns and other things
   autocmd!
-  autocmd FileType c,cpp,cs,java,markdown   setlocal commentstring=//\ %s
+  autocmd FileType c,cpp,cs,java            setlocal commentstring=//\ %s
   autocmd FileType bash,python              setlocal commentstring=#\ %s
   autocmd FileType vim                      setlocal commentstring=\"\ %s
+  autocmd FileType sql                      setlocal commentstring=--\ %s
 
   autocmd FileType markdown                 setlocal spell
+  autocmd FileType markdown                 setlocal commentstring=<!--%s-->
 
+  autocmd FileType gitcommit                setlocal nofoldenable
   autocmd FileType gitcommit                setlocal spell
   autocmd FileType gitcommit                call s:GitCommitSyntax()
+  autocmd FileType gitcommit                call s:GitCommitAbbrev()
   autocmd FileType gitcommit                normal! gg
-  autocmd FileType gitcommit                iab <buffer> b: Bug:
-  autocmd FileType gitcommit                iab <buffer> t: Test:
-  autocmd FileType gitcommit                iab <buffer> f: Fixes:
 
   autocmd FileType scheme                   setlocal lisp
 
@@ -744,6 +752,10 @@ augroup FileTypeOptions
   autocmd BufNewfile,BufReadPost *.pl set filetype=prolog
   autocmd BufNewfile,BufReadPost *.pro,*.flags set filetype=proguard
   autocmd BufNewfile,BufReadPost *.zsh-theme set filetype=zsh
+
+  " TODO(nfischer): consider real filetypes for these.
+  autocmd BufNewFile,BufReadPost *.mojom setfiletype cpp
+  autocmd BufNewFile,BufReadPost *.aidl setfiletype java
 augroup END
 
 "==== Make whitespace visible, but not in insert mode ===="
