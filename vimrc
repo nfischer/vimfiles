@@ -148,11 +148,14 @@ Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
+Plug 'tpope/vim-tbone'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-vinegar'
 Plug 'tyrannicaltoucan/vim-quantum' | let s:quantum_loaded = 1
+Plug 'udalov/kotlin-vim'
 " Plug 'vim-airline/vim-airline' | let s:airline_loaded = 1
 " Plug 'vim-airline/vim-airline-themes'
+Plug 'vim-scripts/proguard.vim'
 Plug 'wellle/tmux-complete.vim'
 Plug 'whatyouhide/vim-lengthmatters'
 Plug 'wlangstroth/vim-racket'
@@ -341,6 +344,8 @@ call s:SetAndMake('undodir', 'undodir')
 " Key mappings {{{
 " ===============================================================
 
+nnoremap <silent> <C-Up> :call RunLastCommandInLastPane()<CR>
+
 noremap  ;  :
 noremap  <Bslash>  ;
 
@@ -439,6 +444,12 @@ nmap         ++  vip++
 " ===============================================================
 " Leader functions {{{
 " ===============================================================
+
+function! RunLastCommandInLastPane()
+  " Note: '!' is shorthand for 'previously active pane' (e.g., the
+  " last/most-recent pane we used).
+  Tmux send-keys -t '!' 'Up' 'C-m'
+endfunction
 
 function! FindGitRoot()
   return system('git rev-parse --show-toplevel 2> /dev/null')[:-2]
@@ -731,6 +742,7 @@ augroup FileTypeOptions
 
   autocmd BufNewfile,BufReadPost *.md set filetype=markdown
   autocmd BufNewfile,BufReadPost *.pl set filetype=prolog
+  autocmd BufNewfile,BufReadPost *.pro,*.flags set filetype=proguard
   autocmd BufNewfile,BufReadPost *.zsh-theme set filetype=zsh
 augroup END
 
