@@ -107,8 +107,8 @@ Plug 'google/vim-codefmt',      Cond(g:has_python)
 Plug 'google/vim-glaive',       Cond(g:has_python)
 Plug 'google/vim-maktaba',      Cond(g:has_python)
 
-Plug 'Shougo/deoplete.nvim', Cond(has('nvim'), { 'do': function('MaybeUpdateRemotePlugins') })
-Plug 'Shougo/neocomplete.vim', Cond(!has('nvim'))
+Plug 'Shougo/deoplete.nvim', Cond(has('nvim') && has('python3'), { 'do': function('MaybeUpdateRemotePlugins') })
+Plug 'Shougo/neocomplete.vim', Cond(!has('nvim') && has('lua') && v:version >= 703)
 
 Plug 'chrisbra/vim-diff-enhanced', Cond(v:version >= 704)
 Plug 'jlanzarotta/bufexplorer', Cond(v:version >= 704)
