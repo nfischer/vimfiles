@@ -643,6 +643,17 @@ command! -nargs=* -complete=file         Wc call s:WordCount(<f-args>)
 
 " }}}
 " ===============================================================
+" Spelling/Typos {{{
+" ===============================================================
+
+" Use :cnoreabbrev for short typos, define new commands for longer words so we
+" can tab complete them.
+cnoreabbrev Tood Todo | cnoreabbrev tood Todo | cnoreabbrev todo Todo
+cnoreabbrev TMux Tmux | cnoreabbrev tmux Tmux
+command! -nargs=0 LengthMattersDisable  LengthmattersDisable
+
+" }}}
+" ===============================================================
 " Autocommands {{{
 " ===============================================================
 
