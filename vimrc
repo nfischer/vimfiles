@@ -451,14 +451,33 @@ function! RunLastCommandInLastPane()
   Tmux send-keys -t '!' 'Up' 'C-m'
 endfunction
 
+function! SearchAllBuffers(query)
+  let l:mybuf = bufnr('%')
+  cex []
+  silent! exe 'bufdo vimgrepadd! /' . a:query . '/ %'
+  if len(getqflist()) == 0
+    silent exe 'buffer' l:mybuf
+    echohl WarningMsg | echomsg 'Unable to find a match for' a:query | echohl NONE
+  else
+    echohl Question | echomsg 'Results are loaded in your quickfix list' | echohl NONE
+  endif
+endfunction
+
 function! FindGitRoot()
   return system('git rev-parse --show-toplevel 2> /dev/null')[:-2]
 endfunction
 
 function! s:RenameTokenFunction(orig, new) range
   if a:orig ==# a:new
-    echoerr 'These are the same thing!'
+    echohl WarningMsg | echomsg 'These are the same thing!' | echohl NONE
+    return
   endif
+
+  " Save search register, to restore later. Note we can't save the cursor
+  " position because this is a range function, so the cursor position is reset
+  " to line 1 before the function call starts.
+  let l:old_gdefault = &gdefault
+  let l:old_search = getreg('/')
 
   let l:reset_pos = 1
   if !search('\<' . a:orig . '\>', 'nw')
@@ -466,14 +485,19 @@ function! s:RenameTokenFunction(orig, new) range
   endif
 
   " Do a global replace
-  let l:old_search = getreg('/')
-  let l:old_gdefault = &gdefault
   set nogdefault
-  silent exe a:firstline . ',' . a:lastline . 's/\C\<' . a:orig . '\>/' . a:new
-      \ . '/g'
-  let &gdefault = l:old_gdefault
-  echo a:orig . ' -> ' . a:new
-  call setreg('/', l:old_search)
+  try
+    exe a:firstline . ',' . a:lastline . 's/\C\<' . a:orig . '\>/' . a:new
+        \ . '/g'
+    echo a:orig . ' -> ' . a:new
+  catch
+    let l:msg = 'Did not find the term `' . a:orig . '`'
+    echohl WarningMsg | echomsg l:msg | echohl NONE
+  finally
+    " Restore values.
+    let &gdefault = l:old_gdefault
+    call setreg('/', l:old_search)
+  endtry
 endfunction
 
 function! MoveSplit(dir)
@@ -501,10 +525,12 @@ endfunction
 
 function! s:AddTodo(msg)
   let l:todo_str = 'TODO(' . $USER . '): ' . a:msg
-  if &commentstring !~# '\v^.+ \%s'
-    let l:todo_str = ' ' . l:todo_str
-  endif
-  let l:full_text = substitute(&commentstring, '%s', l:todo_str, '')
+  " Replace the %s with the todo message, and make sure we're padded by spaces
+  " on either side
+  let l:full_text = substitute(&commentstring, '\v *\%s *', ' ' . l:todo_str . ' ', '')
+  let l:full_text = substitute(l:full_text, '\v +$', '', '')
+
+  " Fetch the appropriate indentation
   let l:line_text = getline('.')
   let l:indent = matchstr(l:line_text, '^\s*')
   put!=l:indent . l:full_text
@@ -620,6 +646,7 @@ nnoremap <leader>S :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") .
 " Custom Commands {{{
 " ===============================================================
 
+command! -nargs=*                        Search  call SearchAllBuffers(<q-args>)
 command! -complete=file -nargs=1         Browser !x-www-browser <args> &>/dev/null &
 command! -nargs=0                        Yank normal! ggVG"+y``
 command! -nargs=0                        Blast normal! ggVG"+p
@@ -630,8 +657,11 @@ command! -nargs=1                        Todo call s:AddTodo(<q-args>)
 command! -nargs=+ -complete=command      Profile echo HowLong(<f-args>)
 
 "  TODO(nate): Move this into a separate plugin
-command! -nargs=* -complete=var -range=% RenameToken <line1>,<line2>
-    \ call s:RenameTokenFunction(<f-args>)
+command! -nargs=* -complete=var -range=% RenameToken
+    \ let b:rename_token_win_view = winsaveview() |
+    \ <line1>,<line2>call s:RenameTokenFunction(<f-args>) |
+    \ call winrestview(b:rename_token_win_view) |
+    \ unlet b:rename_token_win_view
 
 " Enable saving read-only files using sudo
 command! -nargs=0                        W call s:SudoWriteFile()
