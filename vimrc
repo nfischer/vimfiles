@@ -676,11 +676,15 @@ command! -nargs=* -complete=file         Wc call s:WordCount(<f-args>)
 " Spelling/Typos {{{
 " ===============================================================
 
-" Use :cnoreabbrev for short typos, define new commands for longer words so we
-" can tab complete them.
-cnoreabbrev Tood Todo | cnoreabbrev tood Todo | cnoreabbrev todo Todo
-cnoreabbrev TMux Tmux | cnoreabbrev tmux Tmux
-command! -nargs=0 LengthMattersDisable  LengthmattersDisable
+function! s:Typo(mispelled, correct)
+  exe 'command! -nargs=* ' . a:mispelled . ' ' . a:correct . ' <args>'
+endfunction
+command! -nargs=+ Typo call s:Typo(<f-args>)
+
+" Avoid :cnoreabbrev if possible, because it affects searches as well.
+Typo LengthMattersDisable LengthmattersDisable
+Typo Tood Todo
+Typo TMux Tmux
 
 " }}}
 " ===============================================================
