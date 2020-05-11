@@ -197,6 +197,15 @@ let g:markdown_fenced_languages = [
 " Tmux stuff
 let g:tmux_navigator_disable_when_zoomed = 1
 
+" See https://github.com/christoomey/vim-tmux-navigator/issues/189
+function! NetrwMapping()
+  nnoremap <silent> <buffer> <c-l> :TmuxNavigateRight<CR>
+endfunction
+augroup netrw_mapping
+  autocmd!
+  autocmd filetype netrw call NetrwMapping()
+augroup END
+
 " vim-crystal
 let g:crystal_define_mappings = 0 " Don't interfere with commentary
 
