@@ -111,7 +111,6 @@ Plug 'Shougo/deoplete.nvim', Cond(has('nvim') && has('python3'), { 'do': functio
 Plug 'Shougo/neocomplete.vim', Cond(!has('nvim') && has('lua') && v:version >= 703)
 
 Plug 'chrisbra/vim-diff-enhanced', Cond(v:version >= 704)
-Plug 'jlanzarotta/bufexplorer', Cond(v:version >= 704)
 
 Plug 'Shougo/neco-syntax'
 Plug 'Shougo/neco-vim'
@@ -641,7 +640,9 @@ noremap  <silent> <leader>et :<C-u>call
 
 nnoremap <silent> <leader>w  :<C-u>silent call FixWhiteSpace()<CR>
 
-nnoremap <silent> <leader>f  :<C-u>execute 'Files' FindGitRoot()<CR>
+nnoremap <silent> <leader>ff :<C-u>GFiles<CR>
+nnoremap <silent> <leader>fg :<C-u>GFiles?<CR>
+nnoremap <silent> <leader>fb :<C-u>Buffers<CR>
 
 nnoremap          <leader>2  A >&2<ESC>
 
@@ -779,7 +780,7 @@ endfunction
 function! s:GitCommitAbbrev()
   inoreabbrev <buffer> b: Bug:
   inoreabbrev <buffer> t: Test:
-  inoreabbrev <buffer> f: Fixes:
+  inoreabbrev <buffer> f: Fixed:
   inoreabbrev <buffer> nctl No change to logic
 endfunction
 
