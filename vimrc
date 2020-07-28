@@ -269,7 +269,7 @@ if exists('s:detect_indent_loaded')
 endif
 
 " Fugitive settings
-nnoremap          <leader>gdm :<C-u>Gdiffsplit master<CR>
+nnoremap <silent> <leader>gdm :<C-u>exe 'Gdiffsplit ' . GitMainBranch()<CR>
 nnoremap          <leader>gh  :<C-u>Gdiffsplit HEAD~
 nnoremap <silent> <leader>gH  :<C-u>Gdiffsplit HEAD<CR>
 nnoremap <silent> <leader>ga  :<C-u>Gwrite<CR>
@@ -473,6 +473,19 @@ endfunction
 
 function! FindGitRoot()
   return system('git rev-parse --show-toplevel 2> /dev/null')[:-2]
+endfunction
+
+let g:git_main_branches = [
+  \ 'main',
+  \ 'master',
+  \ ]
+function! GitMainBranch()
+  for l:branch in g:git_main_branches
+    if !empty(system('git branch --list ' . l:branch))
+      return l:branch
+    endif
+  endfor
+  return l:branch
 endfunction
 
 function! s:RenameTokenFunction(orig, new) range
