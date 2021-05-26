@@ -270,17 +270,15 @@ if exists('s:detect_indent_loaded')
 endif
 
 " Fugitive settings
-nnoremap <silent> <leader>gdm :<C-u>exe 'Gdiffsplit ' . GitMainBranch()<CR>
-nnoremap          <leader>gh  :<C-u>Gdiffsplit HEAD~
-nnoremap <silent> <leader>gH  :<C-u>Gdiffsplit HEAD<CR>
+nnoremap <silent> <leader>gdm :<C-u>let __diff_cmd = 'Gdiffsplit ' . GitMainBranch()\|exe __diff_cmd\|echo __diff_cmd<CR>
 nnoremap <silent> <leader>ga  :<C-u>Gwrite<CR>
-nnoremap <silent> <leader>gb  :<C-u>Gblame<CR>
-nnoremap <silent> <leader>gc  :<C-u>Gcommit<CR>
+nnoremap <silent> <leader>gb  :<C-u>Git blame<CR>
 nnoremap <silent> <leader>gdd :<C-u>Gdiffsplit<CR>
+nnoremap          <leader>gh  :<C-u>Gdiffsplit HEAD~
 nnoremap <silent> <leader>gh1 :<C-u>Gdiffsplit HEAD~1<CR>
 nnoremap <silent> <leader>ghh :<C-u>Gdiffsplit HEAD<CR>
+nnoremap <silent> <leader>gH  :<C-u>Gdiffsplit HEAD<CR>
 nnoremap <silent> <leader>gi  :<C-u>GEditIgnore<CR>
-nnoremap <silent> <leader>gps :<C-u>Gpush<CR>
 nnoremap <silent> <leader>gs  :<C-u>Gstatus<CR>
 
 " Vim-plug mappings
@@ -476,10 +474,11 @@ function! FindGitRoot()
   return system('git rev-parse --show-toplevel 2> /dev/null')[:-2]
 endfunction
 
-let g:git_main_branches = [
+let g:default_git_main_branches = [
   \ 'main',
   \ 'master',
   \ ]
+let g:git_main_branches = g:default_git_main_branches
 function! GitMainBranch()
   for l:branch in g:git_main_branches
     if !empty(system('git branch --list ' . l:branch))
