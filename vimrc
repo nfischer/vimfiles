@@ -470,6 +470,14 @@ function! SearchAllBuffers(query)
   endif
 endfunction
 
+function! s:Diffoff()
+  let l:currwin = winnr()
+  " let l:mybuf = bufnr('%')
+  windo diffoff
+  " silent exe 'buffer' l:mybuf
+  silent exe currwin . 'wincmd w'
+endfunction
+
 function! FindGitRoot()
   return system('git rev-parse --show-toplevel 2> /dev/null')[:-2]
 endfunction
@@ -668,6 +676,10 @@ nnoremap <leader>S :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") .
 " ===============================================================
 " Custom Commands {{{
 " ===============================================================
+
+" Simpler diffing commands
+command! -nargs=0                        Diff windo diffthis
+command! -nargs=0                        Diffoff call s:Diffoff()
 
 command! -nargs=*                        Search  call SearchAllBuffers(<q-args>)
 command! -complete=file -nargs=1         Browser !x-www-browser <args> &>/dev/null &
