@@ -71,6 +71,7 @@ set virtualedit=block       " makes virtual blocks cleaner and blockier
 set visualbell
 set wildignore+=.DS_Store,*.swp,*.bak,*.pyc,*.class,*.o,*.obj
 set winaltkeys=no           " Don't let Windows eat the alt-key
+set nofixendofline          " It's OK if a file doesn't have a trailing newline
 
 if exists('+inccommand')
   set inccommand=nosplit
@@ -107,7 +108,7 @@ Plug 'google/vim-codefmt',      Cond(g:has_python)
 Plug 'google/vim-glaive',       Cond(g:has_python)
 Plug 'google/vim-maktaba',      Cond(g:has_python)
 
-Plug 'Shougo/deoplete.nvim', Cond(has('nvim') && has('python3'), { 'do': function('MaybeUpdateRemotePlugins') })
+Plug 'Shougo/deoplete.nvim', Cond(has('nvim') && has('python3'), { 'do': ':UpdateRemotePlugins' })
 Plug 'Shougo/neocomplete.vim', Cond(!has('nvim') && has('lua') && v:version >= 703)
 
 Plug 'chrisbra/vim-diff-enhanced', Cond(v:version >= 704)
@@ -786,8 +787,8 @@ augroup END
 
 function! s:GitCommitSyntax()
   " TODO(nfischer): consider implementing hashtag highlighting
-  syntax match Type '\v^(Bug|Fixes|Test|Change-Id):@='
-  syntax match SpellBad '\v^(Fixed):@=' " should be 'Fixes'
+  syntax match Type '\v\C^(Bug|Fixed|Test|Change-Id):@='
+  syntax match SpellBad '\v\C^(Fixes):@=' " should be 'Fixed'
 endfunction
 
 function! s:GitCommitAbbrev()
@@ -802,6 +803,7 @@ augroup FileTypeOptions
   autocmd!
   autocmd FileType c,cpp,cs,java            setlocal commentstring=//\ %s
   autocmd FileType bash,python              setlocal commentstring=#\ %s
+  autocmd FileType crontab                  setlocal commentstring=#\ %s
   autocmd FileType vim                      setlocal commentstring=\"\ %s
   autocmd FileType sql                      setlocal commentstring=--\ %s
 
