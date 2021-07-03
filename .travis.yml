@@ -1,0 +1,22 @@
+language: generic
+sudo: false
+
+env:
+  - EDITOR="vim"
+
+before_install:
+  - $EDITOR --version
+install:
+  - ./install.sh
+script:
+  - $EDITOR -c 'qa'
+os:
+  - linux
+  - osx
+notifications:
+  email: false
+
+addons:
+  apt:
+    packages:
+    - vim-gnome
