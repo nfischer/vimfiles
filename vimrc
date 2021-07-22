@@ -183,6 +183,10 @@ endif
 " Plugin settings {{{
 " ===============================================================
 
+" Lengthmatters plugin
+let g:lengthmatters_excluded = ['unite', 'tagbar', 'startify', 'gundo',
+  \ 'vimshell', 'w3m', 'nerdtree', 'help', 'qf', 'dirvish']
+
 " Configure markdown highlighting. See
 " https://github.com/github/linguist/blob/master/lib/linguist/languages.yml
 let g:markdown_fenced_languages = [
