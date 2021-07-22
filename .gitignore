@@ -11,6 +11,7 @@ autoload/plug.vim
 autoload/plug.vim.old
 spell/
 undodir/
+nvim_undodir/
 .netrwhist
 plugin/instantlyBetterVim12/
 plugin/instantlyBetterVim13/

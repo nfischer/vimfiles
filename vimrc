@@ -349,7 +349,13 @@ function! s:SetAndMake(var_name, location)
   silent! call mkdir(expand(s:prefix . a:location), 'p')
 endfunction
 call s:SetAndMake('directory', 'tmp')
-call s:SetAndMake('undodir', 'undodir')
+
+" Nvim 0.v5 changed the undofile format in a backward incompatible way.
+if has('nvim-0.5')
+  call s:SetAndMake('undodir', 'nvim_undodir')
+else
+  call s:SetAndMake('undodir', 'undodir')
+endif
 
 " }}}
 " ===============================================================
