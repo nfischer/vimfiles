@@ -288,7 +288,7 @@ nnoremap <silent> <leader>gh1 :<C-u>Gdiffsplit HEAD~1<CR>
 nnoremap <silent> <leader>ghh :<C-u>Gdiffsplit HEAD<CR>
 nnoremap <silent> <leader>gH  :<C-u>Gdiffsplit HEAD<CR>
 nnoremap <silent> <leader>gi  :<C-u>GEditIgnore<CR>
-nnoremap <silent> <leader>gs  :<C-u>Gstatus<CR>
+nnoremap <silent> <leader>gs  :<C-u>Git<CR>
 
 " Vim-plug mappings
 nnoremap <silent> <leader>vu :<C-u>PlugUpdate<CR>
