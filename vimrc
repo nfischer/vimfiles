@@ -829,6 +829,7 @@ augroup FileTypeOptions
 
   autocmd FileType markdown                 setlocal spell
   autocmd FileType markdown                 setlocal commentstring=<!--%s-->
+  autocmd FileType markdown                 setlocal conceallevel=0
 
   autocmd FileType gitcommit                setlocal nofoldenable
   autocmd FileType gitcommit                setlocal spell
