@@ -112,6 +112,11 @@ Plug 'Shougo/neocomplete.vim', Cond(!has('nvim') && has('lua') && v:version >= 7
 
 Plug 'chrisbra/vim-diff-enhanced', Cond(v:version >= 704)
 
+
+let g:treesitter_loaded = has('nvim') && has('nvim-0.6')
+Plug 'nvim-treesitter/nvim-treesitter', Cond(g:treesitter_loaded, {'do': ':TSUpdate'})
+Plug 'nvim-treesitter/nvim-treesitter-refactor', Cond(g:treesitter_loaded)
+
 Plug 'Shougo/neco-syntax'
 Plug 'Shougo/neco-vim'
 Plug 'airblade/vim-gitgutter'
@@ -176,6 +181,28 @@ endif
 " ===============================================================
 " Plugin settings {{{
 " ===============================================================
+
+" Treesitter
+if g:treesitter_loaded
+  lua <<EOF
+  require'nvim-treesitter.configs'.setup {
+    highlight = {
+      enable = true,
+      -- Run `:h syntax` and tree-sitter together. The main reason for doing
+      -- this is to get proper indentation.
+      additional_vim_regex_highlighting = true
+    },
+    refactor = {
+      smart_rename = {
+        enable = true,
+        keymaps = {
+          smart_rename = "grr",
+        },
+      },
+    },
+  }
+EOF
+endif
 
 " Lengthmatters plugin
 let g:lengthmatters_excluded = ['unite', 'tagbar', 'startify', 'gundo',
