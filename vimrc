@@ -101,12 +101,6 @@ let g:plug_window = 'enew'
 
 call plug#begin(s:VIMFILES . '/plugged')
 
-function! MaybeUpdateRemotePlugins(info)
-  if has('nvim')
-    UpdateRemotePlugins
-  endif
-endfunction
-
 Plug 'SirVer/ultisnips',        Cond(g:has_python && v:version >= 704)
 Plug 'Valloric/MatchTagAlways', Cond(g:has_python, {'for': ['html', 'xml', 'jinja']})
 Plug 'google/vim-codefmt',      Cond(g:has_python)
