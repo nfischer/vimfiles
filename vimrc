@@ -50,6 +50,7 @@ set modelines=0             " Security reasons
 set mouse=a
 set nobackup                " no annoying file.txt~ files
 set noerrorbells
+set nofixendofline          " It's OK if a file doesn't have a trailing newline
 set nojoinspaces            " Only insert a single space after punctuation
 set noshowmode              " Handled by airline/lightline
 set number numberwidth=1
@@ -71,7 +72,6 @@ set virtualedit=block       " makes virtual blocks cleaner and blockier
 set visualbell
 set wildignore+=.DS_Store,*.swp,*.bak,*.pyc,*.class,*.o,*.obj
 set winaltkeys=no           " Don't let Windows eat the alt-key
-set nofixendofline          " It's OK if a file doesn't have a trailing newline
 
 if exists('+inccommand')
   set inccommand=nosplit
@@ -121,6 +121,10 @@ Plug 'nvim-treesitter/nvim-treesitter-refactor', Cond(g:treesitter_loaded)
 Plug 'airblade/vim-gitgutter', Cond(!g:nvim_gitsigns_loaded)
 Plug 'lewis6991/gitsigns.nvim', Cond(g:nvim_gitsigns_loaded)
 
+" Obsolete as neovim and vim (since version 8.2.2345) have native support
+let g:tmux_focus_events_builtin = has('nvim') || (v:version >= 802 && has('patch2345'))
+Plug 'tmux-plugins/vim-tmux-focus-events', Cond(!g:tmux_focus_events_builtin)
+
 Plug 'Shougo/neco-syntax'
 Plug 'Shougo/neco-vim'
 Plug 'alvan/vim-closetag'
@@ -130,7 +134,7 @@ Plug 'deoplete-plugins/deoplete-zsh'
 Plug 'elzr/vim-json'
 Plug 'hail2u/vim-css3-syntax'
 Plug 'honza/vim-snippets'
-Plug 'itchyny/lightline.vim' | let s:lightline_loaded = 1
+Plug 'itchyny/lightline.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/vim-peekaboo'
@@ -147,7 +151,6 @@ Plug 'rhysd/vim-gfm-syntax'
 Plug 'rhysd/vim-syntax-christmas-tree'
 Plug 'snaewe/Instantly_Better_Vim_2013'
 Plug 'tmux-plugins/vim-tmux'
-Plug 'tmux-plugins/vim-tmux-focus-events'
 Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-dispatch'
@@ -160,8 +163,6 @@ Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-vinegar'
 Plug 'tyrannicaltoucan/vim-quantum' | let s:quantum_loaded = 1
 Plug 'udalov/kotlin-vim'
-" Plug 'vim-airline/vim-airline' | let s:airline_loaded = 1
-" Plug 'vim-airline/vim-airline-themes'
 Plug 'vim-scripts/proguard.vim'
 Plug 'wellle/tmux-complete.vim'
 Plug 'whatyouhide/vim-lengthmatters'
@@ -302,7 +303,6 @@ if has('termguicolors')
 endif
 
 if exists('s:quantum_loaded')
-  let g:airline_theme = 'quantum'
   let g:lightline = {
       \ 'colorscheme': 'quantum',
       \ }
@@ -860,9 +860,6 @@ augroup ConfigReload
   autocmd!
   autocmd BufWritePost $MYVIMRC source $MYVIMRC
   exe 'autocmd BufWritePost ' . g:local_vimrc . ' source ' . g:local_vimrc
-  if exists('s:airline_loaded')
-    autocmd BufWritePost $MYVIMRC AirlineRefresh
-  endif
 augroup END
 
 "==== No damn blinking lights! ===="
