@@ -652,20 +652,21 @@ endfunction
 
 "==== Edit .vimrc quickly ===="
 function! EditConfigFile(config_name, ...)
-  if !filewritable(a:config_name)
-    let l:msg = a:config_name . " can't be edited"
+  let l:config_name = resolve(a:config_name) " Follow symlinks
+  if !filewritable(l:config_name)
+    let l:msg = l:config_name . " can't be edited"
     echohl ErrorMsg | echo l:msg | echohl NONE
   else
     let l:fname = expand('%:p')
     if line('$') == 1 && empty(getline(1)) && empty(l:fname)
       " We're not editing anything interesting, so open in a full window
-      exe 'edit ' . a:config_name
-    elseif l:fname ==# a:config_name && !exists('s:warned_for_file')
+      exe 'edit ' . l:config_name
+    elseif l:fname ==# l:config_name && !exists('s:warned_for_file')
       let l:msg = 'Already editing ' . expand('%:t') . '. Try again to open'
       echohl WarningMsg | echo l:msg | echohl NONE
       let s:warned_for_file = 1
     else
-      exe 'vsp ' . a:config_name
+      exe 'vsp ' . l:config_name
     endif
     " Configure this buffer
     if !exists('a:1')
