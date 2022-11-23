@@ -881,7 +881,7 @@ augroup END
 
 function! s:GitCommitSyntax()
   " TODO(nfischer): consider implementing hashtag highlighting
-  syntax match Type '\v\C^(Bug|Fixed|Test|Change-Id):@='
+  syntax match Type '\v\C^(Bug|Fixed|Test|Change-Id|Merged-In):@='
   syntax match SpellBad '\v\C^(Fixes):@=' " should be 'Fixed'
 endfunction
 
@@ -911,12 +911,15 @@ augroup FileTypeOptions
   autocmd FileType gitcommit                call s:GitCommitAbbrev()
   autocmd FileType gitcommit                normal! gg
 
+  autocmd FileType gitconfig                setlocal noexpandtab
+
   autocmd FileType scheme                   setlocal lisp
 
   autocmd BufNewfile,BufReadPost *.md set filetype=markdown
   autocmd BufNewfile,BufReadPost *.pl set filetype=prolog
   autocmd BufNewfile,BufReadPost *.pro,*.flags set filetype=proguard
   autocmd BufNewfile,BufReadPost *.zsh-theme set filetype=zsh
+  autocmd BufNewfile,BufReadPost .gitconfig.local set filetype=gitconfig
 
   " TODO(nfischer): consider real filetypes for these.
   autocmd BufNewFile,BufReadPost *.mojom setfiletype cpp
