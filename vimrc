@@ -355,7 +355,12 @@ let g:deoplete#enable_at_startup = 1
 let g:neocomplete#enable_at_startup = 1
 
 " Airline/lightline settings
-set laststatus=2
+if has('nvim') && has('nvim-0.7.2')
+  " Global status line (across all windows)
+  set laststatus=3
+else
+  set laststatus=2
+endif
 
 " PatienceDiff settings
 if v:version >= 704
