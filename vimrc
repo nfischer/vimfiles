@@ -118,6 +118,7 @@ let g:nvim_gitsigns_loaded = has('nvim') && has('nvim-0.7')
 
 Plug 'nvim-treesitter/nvim-treesitter', Cond(g:treesitter_loaded, {'do': ':TSUpdate'})
 Plug 'nvim-treesitter/nvim-treesitter-refactor', Cond(g:treesitter_loaded)
+Plug 'nvim-treesitter/nvim-treesitter-textobjects', Cond(g:treesitter_loaded)
 Plug 'airblade/vim-gitgutter', Cond(!g:nvim_gitsigns_loaded)
 Plug 'lewis6991/gitsigns.nvim', Cond(g:nvim_gitsigns_loaded)
 
@@ -246,8 +247,29 @@ if g:treesitter_loaded
       smart_rename = {
         enable = true,
         keymaps = {
-          smart_rename = "grr",
+          smart_rename = 'grr',
         },
+      },
+    },
+    textobjects = {
+      select = {
+        enable = true,
+        keymaps = {
+          ['af'] = '@function.outer',
+          ['if'] = '@function.inner',
+          ['ac'] = '@class.outer',
+          ['ic'] = '@class.inner',
+        },
+        include_surrounding_whitespace = function(selection)
+          -- These text objects include surrounding whitespace (ex. blank lines
+          -- after a function definition).
+          local queries = {
+            '@function.outer',
+            '@class.outer',
+          }
+
+          return vim.tbl_contains(queries, selection.query_string)
+        end,
       },
     },
   }
