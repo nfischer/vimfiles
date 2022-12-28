@@ -366,14 +366,6 @@ if v:version >= 704
   let &diffexpr='EnhancedDiff#Diff("git diff", "--diff-algorithm=patience")'
 endif
 
-" DetectIndent settings
-if exists('s:detect_indent_loaded')
-  augroup DetectIndent
-    autocmd!
-    autocmd BufReadPost * DetectIndent
-  augroup END
-endif
-
 " Fugitive settings
 nnoremap <silent> <leader>gdm :<C-u>let __diff_cmd = 'Gdiffsplit ' . GitMainBranch()\|exe __diff_cmd\|echo __diff_cmd<CR>
 nnoremap <silent> <leader>ga  :<C-u>Gwrite<CR>
@@ -550,10 +542,6 @@ vmap  <expr>  <UP>     DVB_Drag('up')
 vmap  <expr>  D        DVB_Duplicate()
 let g:DVB_TrimWS = 1
 
-"==== Changes list from comma separated to bulleted and back ===="
-nmap  <leader>lt  :call ListTrans_toggle_format()<CR>
-vmap  <leader>lt  :call ListTrans_toggle_format('visual')<CR>
-
 "==== Do some math on columns. Instantly better vim ===="
 vmap <expr>  ++  VMATH_YankAndAnalyse()
 nmap         ++  vip++
@@ -587,10 +575,6 @@ function! s:Diffoff()
   windo diffoff
   " silent exe 'buffer' l:mybuf
   silent exe currwin . 'wincmd w'
-endfunction
-
-function! FindGitRoot()
-  return system('git rev-parse --show-toplevel 2> /dev/null')[:-2]
 endfunction
 
 let g:default_git_main_branches = [
