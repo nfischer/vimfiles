@@ -942,15 +942,33 @@ augroup FileTypeOptions
 
   autocmd FileType scheme                   setlocal lisp
 
-  autocmd BufNewfile,BufReadPost *.md set filetype=markdown
-  autocmd BufNewfile,BufReadPost *.pl set filetype=prolog
-  autocmd BufNewfile,BufReadPost *.pro,*.flags set filetype=proguard
-  autocmd BufNewfile,BufReadPost *.zsh-theme set filetype=zsh
-  autocmd BufNewfile,BufReadPost .gitconfig.local set filetype=gitconfig
-
-  " TODO(nfischer): consider real filetypes for these.
-  autocmd BufNewFile,BufReadPost *.mojom setfiletype cpp
-  autocmd BufNewFile,BufReadPost *.aidl setfiletype java
+  if has('nvim')
+    lua <<EOF
+    vim.filetype.add({
+      extension = {
+        md = 'markdown',
+        pl = 'prolog',
+        pro = 'proguard',
+        flags = 'proguard',
+        ['zsh-theme'] = 'zsh',
+        mojom = 'cpp',
+        aidl = 'java',
+      },
+      filename = {
+        ['.gitconfig.local'] = 'gitconfig',
+        ['gitconfig'] = 'gitconfig',
+      },
+    })
+EOF
+  else
+    autocmd BufNewfile,BufReadPost *.md set filetype=markdown
+    autocmd BufNewfile,BufReadPost *.pl set filetype=prolog
+    autocmd BufNewfile,BufReadPost *.pro,*.flags set filetype=proguard
+    autocmd BufNewfile,BufReadPost *.zsh-theme set filetype=zsh
+    autocmd BufNewfile,BufReadPost gitconfig,.gitconfig.local set filetype=gitconfig
+    autocmd BufNewFile,BufReadPost *.mojom setfiletype cpp
+    autocmd BufNewFile,BufReadPost *.aidl setfiletype java
+  endif
 augroup END
 
 "==== Make whitespace visible, but not in insert mode ===="
