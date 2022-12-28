@@ -942,7 +942,7 @@ augroup FileTypeOptions
 
   autocmd FileType scheme                   setlocal lisp
 
-  if has('nvim')
+  if has('nvim') && has('nvim-0.8')
     lua <<EOF
     vim.filetype.add({
       extension = {
