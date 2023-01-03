@@ -187,91 +187,91 @@ endif
 " ===============================================================
 
 if g:nvim_gitsigns_loaded
-  lua <<EOF
-  -- Adapted from https://github.com/lewis6991/gitsigns.nvim
-  require('gitsigns').setup{
-    on_attach = function(bufnr)
-      local gs = package.loaded.gitsigns
+lua <<EOF
+-- Adapted from https://github.com/lewis6991/gitsigns.nvim
+require('gitsigns').setup{
+  on_attach = function(bufnr)
+    local gs = package.loaded.gitsigns
 
-      local function map(mode, lhs, rhs, opts)
-        opts = opts or {}
-        opts.buffer = bufnr
-        vim.keymap.set(mode, lhs, rhs, opts)
-      end
-
-      -- Navigation
-      map('n', ']c', function()
-        if vim.wo.diff then return ']c' end
-        vim.schedule(function() gs.next_hunk({wrap=false}) end)
-        return '<Ignore>'
-      end, {expr=true})
-
-      map('n', '[c', function()
-        if vim.wo.diff then return '[c' end
-        vim.schedule(function() gs.prev_hunk({wrap=false}) end)
-        return '<Ignore>'
-      end, {expr=true})
-
-      -- Actions
-      map({'n', 'v'}, '<leader>hs', ':Gitsigns stage_hunk<CR>')
-      map({'n', 'v'}, '<leader>hr', ':Gitsigns reset_hunk<CR>')
-      map('n', '<leader>hS', gs.stage_buffer)
-      map('n', '<leader>hu', gs.undo_stage_hunk)
-      map('n', '<leader>hR', gs.reset_buffer)
-      map('n', '<leader>hp', gs.preview_hunk)
-      map('n', '<leader>hb', function() gs.blame_line{full=true} end)
-      map('n', '<leader>tb', gs.toggle_current_line_blame)
-      map('n', '<leader>hd', gs.diffthis)
-      map('n', '<leader>hD', function() gs.diffthis('~') end)
-      map('n', '<leader>td', gs.toggle_deleted)
-
-      -- Text object
-      map({'o', 'x'}, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
+    local function map(mode, lhs, rhs, opts)
+      opts = opts or {}
+      opts.buffer = bufnr
+      vim.keymap.set(mode, lhs, rhs, opts)
     end
-  }
+
+    -- Navigation
+    map('n', ']c', function()
+      if vim.wo.diff then return ']c' end
+      vim.schedule(function() gs.next_hunk({wrap=false}) end)
+      return '<Ignore>'
+    end, {expr=true})
+
+    map('n', '[c', function()
+      if vim.wo.diff then return '[c' end
+      vim.schedule(function() gs.prev_hunk({wrap=false}) end)
+      return '<Ignore>'
+    end, {expr=true})
+
+    -- Actions
+    map({'n', 'v'}, '<leader>hs', ':Gitsigns stage_hunk<CR>')
+    map({'n', 'v'}, '<leader>hr', ':Gitsigns reset_hunk<CR>')
+    map('n', '<leader>hS', gs.stage_buffer)
+    map('n', '<leader>hu', gs.undo_stage_hunk)
+    map('n', '<leader>hR', gs.reset_buffer)
+    map('n', '<leader>hp', gs.preview_hunk)
+    map('n', '<leader>hb', function() gs.blame_line{full=true} end)
+    map('n', '<leader>tb', gs.toggle_current_line_blame)
+    map('n', '<leader>hd', gs.diffthis)
+    map('n', '<leader>hD', function() gs.diffthis('~') end)
+    map('n', '<leader>td', gs.toggle_deleted)
+
+    -- Text object
+    map({'o', 'x'}, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
+  end
+}
 EOF
 endif
 
 " Treesitter
 if g:treesitter_loaded
-  lua <<EOF
-  require'nvim-treesitter.configs'.setup {
-    highlight = {
+lua <<EOF
+require'nvim-treesitter.configs'.setup {
+  highlight = {
+    enable = true,
+    -- Run `:h syntax` and tree-sitter together. The main reason for doing
+    -- this is to get proper indentation.
+    additional_vim_regex_highlighting = true
+  },
+  refactor = {
+    smart_rename = {
       enable = true,
-      -- Run `:h syntax` and tree-sitter together. The main reason for doing
-      -- this is to get proper indentation.
-      additional_vim_regex_highlighting = true
-    },
-    refactor = {
-      smart_rename = {
-        enable = true,
-        keymaps = {
-          smart_rename = 'grr',
-        },
+      keymaps = {
+        smart_rename = 'grr',
       },
     },
-    textobjects = {
-      select = {
-        enable = true,
-        keymaps = {
-          ['af'] = '@function.outer',
-          ['if'] = '@function.inner',
-          ['ac'] = '@class.outer',
-          ['ic'] = '@class.inner',
-        },
-        include_surrounding_whitespace = function(selection)
-          -- These text objects include surrounding whitespace (ex. blank lines
-          -- after a function definition).
-          local queries = {
-            '@function.outer',
-            '@class.outer',
-          }
+  },
+  textobjects = {
+    select = {
+      enable = true,
+      keymaps = {
+        ['af'] = '@function.outer',
+        ['if'] = '@function.inner',
+        ['ac'] = '@class.outer',
+        ['ic'] = '@class.inner',
+      },
+      include_surrounding_whitespace = function(selection)
+        -- These text objects include surrounding whitespace (ex. blank lines
+        -- after a function definition).
+        local queries = {
+          '@function.outer',
+          '@class.outer',
+        }
 
-          return vim.tbl_contains(queries, selection.query_string)
-        end,
-      },
+        return vim.tbl_contains(queries, selection.query_string)
+      end,
     },
-  }
+  },
+}
 EOF
 endif
 
@@ -926,22 +926,22 @@ augroup FileTypeOptions
   autocmd FileType scheme                   setlocal lisp
 
   if has('nvim') && has('nvim-0.8')
-    lua <<EOF
-    vim.filetype.add({
-      extension = {
-        md = 'markdown',
-        pl = 'prolog',
-        pro = 'proguard',
-        flags = 'proguard',
-        ['zsh-theme'] = 'zsh',
-        mojom = 'cpp',
-        aidl = 'java',
-      },
-      filename = {
-        ['.gitconfig.local'] = 'gitconfig',
-        ['gitconfig'] = 'gitconfig',
-      },
-    })
+  lua <<EOF
+  vim.filetype.add({
+    extension = {
+      md = 'markdown',
+      pl = 'prolog',
+      pro = 'proguard',
+      flags = 'proguard',
+      ['zsh-theme'] = 'zsh',
+      mojom = 'cpp',
+      aidl = 'java',
+    },
+    filename = {
+      ['.gitconfig.local'] = 'gitconfig',
+      ['gitconfig'] = 'gitconfig',
+    },
+  })
 EOF
   else
     autocmd BufNewfile,BufReadPost *.md set filetype=markdown
