@@ -103,7 +103,7 @@ call plug#begin(s:VIMFILES . '/plugged')
 
 Plug 'SirVer/ultisnips',        Cond(g:has_python && v:version >= 800)
 Plug 'Valloric/MatchTagAlways', Cond(g:has_python, {'for': ['html', 'xml', 'jinja']})
-Plug 'google/vim-codefmt',      Cond(g:has_python)
+Plug 'google/vim-codefmt',      Cond(g:has_python, {'for': ['gn'], 'on': ['FormatCode', 'FormatLines']})
 Plug 'google/vim-glaive',       Cond(g:has_python)
 Plug 'google/vim-maktaba',      Cond(g:has_python)
 
