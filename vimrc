@@ -115,12 +115,17 @@ Plug 'chrisbra/vim-diff-enhanced', Cond(v:version >= 704)
 
 let g:treesitter_loaded = has('nvim') && has('nvim-0.6')
 let g:nvim_gitsigns_loaded = has('nvim') && has('nvim-0.7')
+let g:nvim_comment_loaded = has('nvim') && has('nvim-0.7')
 
 Plug 'nvim-treesitter/nvim-treesitter', Cond(g:treesitter_loaded, {'do': ':TSUpdate'})
 Plug 'nvim-treesitter/nvim-treesitter-refactor', Cond(g:treesitter_loaded)
 Plug 'nvim-treesitter/nvim-treesitter-textobjects', Cond(g:treesitter_loaded)
+" Git signs:
 Plug 'airblade/vim-gitgutter', Cond(!g:nvim_gitsigns_loaded)
 Plug 'lewis6991/gitsigns.nvim', Cond(g:nvim_gitsigns_loaded)
+" Commenting:
+Plug 'tpope/vim-commentary', Cond(!g:nvim_comment_loaded)
+Plug 'numToStr/Comment.nvim', Cond(g:nvim_comment_loaded)
 
 " Obsolete as neovim and vim (since version 8.2.2345) have native support
 let g:tmux_focus_events_builtin = has('nvim') || (v:version >= 802 && has('patch2345'))
@@ -153,7 +158,6 @@ Plug 'rhysd/vim-syntax-christmas-tree'
 Plug 'snaewe/Instantly_Better_Vim_2013'
 Plug 'tmux-plugins/vim-tmux'
 Plug 'tpope/vim-abolish'
-Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-repeat'
@@ -185,6 +189,12 @@ endif
 " ===============================================================
 " Plugin settings {{{
 " ===============================================================
+
+if g:nvim_comment_loaded
+lua << EOF
+require('Comment').setup()
+EOF
+endif
 
 if g:nvim_gitsigns_loaded
 lua <<EOF
