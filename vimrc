@@ -108,13 +108,13 @@ Plug 'google/vim-glaive',       Cond(g:has_python)
 Plug 'google/vim-maktaba',      Cond(g:has_python)
 
 Plug 'Shougo/deoplete.nvim', Cond(has('nvim') && has('python3'), { 'do': ':UpdateRemotePlugins' })
-Plug 'Shougo/neocomplete.vim', Cond(!has('nvim') && has('lua') && v:version >= 703)
+Plug 'Shougo/neocomplete.vim', Cond(!has('nvim') && has('lua') && v:version >= 703 && !has('patch-8.2.1066'))
 
 Plug 'chrisbra/vim-diff-enhanced', Cond(v:version >= 704)
 
 
 let g:treesitter_loaded = has('nvim') && has('nvim-0.6')
-let g:nvim_gitsigns_loaded = has('nvim') && has('nvim-0.7')
+let g:nvim_gitsigns_loaded = has('nvim') && has('nvim-0.8')
 let g:nvim_comment_loaded = has('nvim') && has('nvim-0.7')
 
 Plug 'nvim-treesitter/nvim-treesitter', Cond(g:treesitter_loaded, {'do': ':TSUpdate'})
