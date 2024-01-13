@@ -79,6 +79,24 @@ endif
 
 " }}}
 " ===============================================================
+" remote plugins (python3, ruby, etc.) {{{
+" ===============================================================
+
+" Only query python3 to avoid loading python2 during startup. Python3 should be
+" sufficient for most plugins at this point. `loaded_python_provider = 0` isn't
+" strictly necessary (it's sufficient to just not query py2), but this avoids
+" regressions if some plugin queries py2.
+let g:loaded_python_provider = 0
+let g:has_python = has('python3')
+
+" Disable the ruby provider.
+let g:loaded_ruby_provider = 0
+
+" Disable the perl provider.
+let g:loaded_perl_provider = 0
+
+" }}}
+" ===============================================================
 " vim-plug {{{
 " ===============================================================
 
@@ -89,13 +107,6 @@ function! Cond(cond, ...)
   let l:opts = get(a:000, 0, {})
   return a:cond ? l:opts : extend(l:opts, { 'on': [], 'for': [] })
 endfunction
-
-" Only query python3 to avoid loading python2 during startup. Python3 should be
-" sufficient for most plugins at this point. `loaded_python_provider = 0` isn't
-" strictly necessary (it's sufficient to just not query py2), but this avoids
-" regressions if some plugin queries py2.
-let g:loaded_python_provider = 0
-let g:has_python = has('python3')
 
 let g:plug_window = 'enew'
 
