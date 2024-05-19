@@ -126,7 +126,7 @@ Plug 'chrisbra/vim-diff-enhanced', Cond(v:version >= 704)
 
 let g:treesitter_loaded = has('nvim') && has('nvim-0.6')
 let g:nvim_gitsigns_loaded = has('nvim') && has('nvim-0.8')
-let g:nvim_comment_loaded = has('nvim') && has('nvim-0.7')
+let g:nvim_comment_loaded = has('nvim') && has('nvim-0.10')
 
 Plug 'nvim-treesitter/nvim-treesitter', Cond(g:treesitter_loaded, {'do': ':TSUpdate'})
 Plug 'nvim-treesitter/nvim-treesitter-refactor', Cond(g:treesitter_loaded)
@@ -136,7 +136,6 @@ Plug 'airblade/vim-gitgutter', Cond(!g:nvim_gitsigns_loaded)
 Plug 'lewis6991/gitsigns.nvim', Cond(g:nvim_gitsigns_loaded)
 " Commenting:
 Plug 'tpope/vim-commentary', Cond(!g:nvim_comment_loaded)
-Plug 'numToStr/Comment.nvim', Cond(g:nvim_comment_loaded)
 
 " Obsolete as neovim and vim (since version 8.2.2345) have native support
 let g:tmux_focus_events_builtin = has('nvim') || (v:version >= 802 && has('patch2345'))
@@ -203,7 +202,13 @@ endif
 
 if g:nvim_comment_loaded
 lua << EOF
-require('Comment').setup()
+vim.api.nvim_create_autocmd({ 'FileType' }, {
+  desc = 'Force commentstring to put a space after the comment marker',
+  callback = function(event)
+    local cs = vim.bo[event.buf].commentstring
+    vim.bo[event.buf].commentstring = cs:gsub('(%S)%%s', '%1 %%s'):gsub('%%s(%S)', '%%s %1')
+  end,
+})
 EOF
 endif
 
@@ -341,8 +346,10 @@ xmap ga <Plug>(EasyAlign)
 nmap ga <Plug>(EasyAlign)
 
 " Syntax highlighting and colorscheme
-if has('termguicolors')
-  " Must enable true color on vim8, because it's dumb...
+
+" Enable true color support. vim8 needs t_8f and t_8b escape sequences. nvim
+" 0.10 will figure all of this out automatically.
+if has('termguicolors') && !(has('nvim') && has('nvim') && has('nvim-0.10'))
   let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
   let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
   set termguicolors
@@ -483,11 +490,13 @@ noremap  <Bslash>  ;
 " Space should do something useful
 nnoremap <silent> <space> :w<CR>
 
-" Vim uses Q to switch to "Ex" mode. Instead, use this as an easy way to apply
-" macros. Neovim already maps Q to something similar (except it uses the last
-" recorded register, instead of 'q').
-nnoremap Q @q
-vnoremap <silent> Q :normal! @q<CR>
+if !(has('nvim') && has('nvim-0.10'))
+  " Vim uses Q to switch to "Ex" mode. Instead, use this as an easy way to apply
+  " macros. Neovim already maps Q to something similar (except it uses the last
+  " recorded register, instead of 'q').
+  nnoremap Q @q
+  vnoremap <silent> Q :normal! @q<CR>
+endif
 
 " Force tmux to respect <C-a>
 cnoremap  <C-a> <home>
