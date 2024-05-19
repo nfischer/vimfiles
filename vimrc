@@ -483,8 +483,11 @@ noremap  <Bslash>  ;
 " Space should do something useful
 nnoremap <silent> <space> :w<CR>
 
-" Macros should be easy to apply
+" Vim uses Q to switch to "Ex" mode. Instead, use this as an easy way to apply
+" macros. Neovim already maps Q to something similar (except it uses the last
+" recorded register, instead of 'q').
 nnoremap Q @q
+vnoremap <silent> Q :normal! @q<CR>
 
 " Force tmux to respect <C-a>
 cnoremap  <C-a> <home>
