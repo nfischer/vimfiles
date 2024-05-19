@@ -934,7 +934,8 @@ augroup FileTypeOptions
 
   autocmd FileType markdown                 setlocal spell
   autocmd FileType markdown                 setlocal commentstring=<!--%s-->
-  autocmd FileType markdown                 setlocal conceallevel=0
+  " Workaround https://github.com/elzr/vim-json/issues/104
+  autocmd BufNewfile,BufReadPost *.md       setlocal conceallevel=0
 
   autocmd FileType gitcommit                setlocal nofoldenable
   autocmd FileType gitcommit                setlocal spell
