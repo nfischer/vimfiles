@@ -37,7 +37,6 @@ set diffopt=filler,vertical
 set foldlevel=0
 set foldmethod=marker
 set gdefault                " Add g flag to search/replace
-set guioptions=T
 set hidden                  " Buffers finally don't suck
 set history=10000
 set hlsearch                " highlights search results
