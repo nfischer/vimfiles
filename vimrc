@@ -339,8 +339,9 @@ nmap ga <Plug>(EasyAlign)
 " Syntax highlighting and colorscheme
 
 " Enable true color support. vim8 needs t_8f and t_8b escape sequences. nvim
-" 0.10 will figure all of this out automatically.
-if has('termguicolors') && !(has('nvim') && has('nvim') && has('nvim-0.10'))
+" 0.10+ is supposed to be able to figure out 'termguicolors' automatically, but
+" it doesn't seem to work properly over ssh.
+if has('termguicolors')
   let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
   let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
   set termguicolors
