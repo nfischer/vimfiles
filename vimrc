@@ -302,7 +302,8 @@ endif
 
 " Lengthmatters plugin
 let g:lengthmatters_excluded = ['unite', 'tagbar', 'startify', 'gundo',
-  \ 'vimshell', 'w3m', 'nerdtree', 'help', 'qf', 'dirvish', 'log', 'txt']
+  \ 'vimshell', 'w3m', 'nerdtree', 'help', 'qf', 'dirvish',
+  \ 'log', 'text', ''] " Custom additions
 
 " Configure markdown highlighting. See
 " https://github.com/github/linguist/blob/master/lib/linguist/languages.yml
