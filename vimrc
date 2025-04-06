@@ -123,8 +123,9 @@ Plug 'Shougo/neocomplete.vim', Cond(!has('nvim') && has('lua') && v:version >= 7
 Plug 'chrisbra/vim-diff-enhanced', Cond(v:version >= 704)
 
 
-let g:treesitter_loaded = has('nvim') && has('nvim-0.6')
-let g:nvim_gitsigns_loaded = has('nvim') && has('nvim-0.8')
+let g:treesitter_loaded = has('nvim') && has('nvim-0.10')
+let g:nvim_gitsigns_loaded = has('nvim') && has('nvim-0.9')
+" Built-in comment support in nvim-0.10!
 let g:nvim_comment_loaded = has('nvim') && has('nvim-0.10')
 
 Plug 'nvim-treesitter/nvim-treesitter', Cond(g:treesitter_loaded, {'do': ':TSUpdate'})
