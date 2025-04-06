@@ -953,31 +953,35 @@ augroup FileTypeOptions
   autocmd FileType scheme                   setlocal lisp
 
   if has('nvim') && has('nvim-0.8')
-  lua <<EOF
-  vim.filetype.add({
-    extension = {
-      md = 'markdown',
-      pl = 'prolog',
-      pro = 'proguard',
-      flags = 'proguard',
-      ['zsh-theme'] = 'zsh',
-      mojom = 'cpp',
-      aidl = 'java',
-    },
-    filename = {
-      ['.gitconfig.local'] = 'gitconfig',
-      ['gitconfig'] = 'gitconfig',
-    },
-  })
+    lua <<EOF
+    vim.filetype.add({
+      extension = {
+        md = 'markdown',
+        pl = 'prolog',
+        pro = 'proguard',
+        flags = 'proguard',
+        ['zsh-theme'] = 'zsh',
+        mojom = 'cpp',
+        aidl = 'java',
+      },
+      filename = {
+        ['.gitconfig.local'] = 'gitconfig',
+        ['gitconfig'] = 'gitconfig',
+        ['shell_aliases'] = 'bash',
+        ['.shell_aliases'] = 'bash',
+      },
+    })
 EOF
   else
     autocmd BufNewfile,BufReadPost *.md set filetype=markdown
     autocmd BufNewfile,BufReadPost *.pl set filetype=prolog
     autocmd BufNewfile,BufReadPost *.pro,*.flags set filetype=proguard
     autocmd BufNewfile,BufReadPost *.zsh-theme set filetype=zsh
-    autocmd BufNewfile,BufReadPost gitconfig,.gitconfig.local set filetype=gitconfig
     autocmd BufNewFile,BufReadPost *.mojom setfiletype cpp
     autocmd BufNewFile,BufReadPost *.aidl setfiletype java
+
+    autocmd BufNewfile,BufReadPost gitconfig,.gitconfig.local set filetype=gitconfig
+    autocmd BufNewfile,BufReadPost shell_aliases,.shell_aliases set filetype=bash
   endif
 augroup END
 
