@@ -985,15 +985,6 @@ EOF
   endif
 augroup END
 
-" Fix Vim help file detection. See:
-" https://github.com/neovim/neovim/issues/33359
-" https://github.com/vim/vim/issues/17069
-" https://github.com/vim/vim/commit/e370141bf41919642061ee2e78340dca84678712
-au BufNewFile,BufRead */doc/*.txt
-  \  if getline('$') =~ '\%(^\|\s\)vim:\%(.*\%(:\|\s\)\)\?\%(ft\|filetype\)=help\%(:\|\s\|$\)'
-  \|   setf help
-  \| endif
-
 "==== Make whitespace visible, but not in insert mode ===="
 augroup InsertEvents
   autocmd!
