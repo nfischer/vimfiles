@@ -321,6 +321,9 @@ let g:markdown_fenced_languages = [
   \ 'vim',
   \ 'xml',
   \ ]
+" Fix a circular dependency issue: https://github.com/vim/vim/pull/15740. This
+" means ```java fenced codeblocks won't be highlighted in markdown anymore.
+let g:java_ignore_markdown = 1
 
 " Tmux stuff
 let g:tmux_navigator_disable_when_zoomed = 1
