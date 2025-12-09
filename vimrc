@@ -764,6 +764,19 @@ function! s:WordCount(...)
   endif
 endfunction
 
+function! s:FormatJson(has_bang)
+  if &filetype !=# 'json' && &filetype !=# '' && !a:has_bang
+    let l:msg = 'Error: this is not a JSON filetype (use ! to override)'
+    echohl ErrorMsg | echo l:msg | echohl NONE
+    return
+  endif
+  let l:output = system('jq', join(getline(1, '$'), '\n'))
+
+  " Delete the current buffer and replace it with the formatted JSON
+  silent normal! ggdG
+  call setline(1, split(l:output, '\n'))
+endfunction
+
 " }}}
 " ===============================================================
 " Leader mappings {{{
@@ -830,6 +843,9 @@ command! -nargs=0                        W call s:SudoWriteFile()
 command! -nargs=+ -complete=file         Open call s:OpenFunction(<f-args>)
 command! -nargs=* -complete=file         Ls echo system('ls --color=auto ' . <q-args>)
 command! -nargs=* -complete=file         Wc call s:WordCount(<f-args>)
+command! -nargs=0 -bang                  Jq call s:FormatJson(<bang>0)
+command! -nargs=0 -bang                  JQ call s:FormatJson(<bang>0)
+command! -nargs=0 -bang                  FormatJson call s:FormatJson(<bang>0)
 
 " }}}
 " ===============================================================
